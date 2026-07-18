@@ -229,7 +229,7 @@ function Landing({ onStart }: { onStart: () => void }) {
 
       <div className="mt-12 rounded-xl border border-gold-deep/30 bg-char p-5 sm:p-6">
         <h2 className="font-display text-center text-gold text-lg tracking-wide">10 Categories. One Vote Each.</h2>
-        <div className="mt-4 grid grid-cols-2 gap-2 text-sm">
+        <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
           {CATEGORIES.map((c, i) => (
             <div key={c.id} className="flex items-start gap-2 text-parchment/80">
               <span className="font-mono text-xs text-gold-deep mt-0.5">{String(i + 1).padStart(2, "0")}</span>
@@ -459,11 +459,20 @@ function ReviewStep({
           const nominee = c.nominees.find((n) => n.id === nomineeId);
           return (
             <div key={c.id} className="flex items-center justify-between gap-3 px-5 py-4">
-              <div className="min-w-0">
-                <p className="font-mono text-[10px] uppercase tracking-wide text-gold-deep">{c.title}</p>
-                <p className="mt-0.5 font-body font-semibold text-parchment truncate">
-                  {nominee ? nominee.name : <span className="text-maroon-light">Not voted</span>}
-                </p>
+              <div className="flex items-center gap-3 min-w-0">
+                {nominee?.imageUrl && (
+                  <img
+                    src={nominee.imageUrl}
+                    alt={nominee.name}
+                    className="h-8 w-8 rounded-full object-cover border border-white/10 shrink-0"
+                  />
+                )}
+                <div className="min-w-0">
+                  <p className="font-mono text-[10px] uppercase tracking-wide text-gold-deep">{c.title}</p>
+                  <p className="mt-0.5 font-body font-semibold text-parchment truncate">
+                    {nominee ? nominee.name : <span className="text-maroon-light">Not voted</span>}
+                  </p>
+                </div>
               </div>
               <button
                 onClick={() => onEdit(i)}

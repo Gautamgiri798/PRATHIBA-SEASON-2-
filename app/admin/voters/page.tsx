@@ -52,7 +52,7 @@ export default async function VotersReportPage() {
             </h1>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2.5">
             <Link
               href="/admin"
               className="rounded-full border border-white/15 bg-char px-5 py-2 text-xs font-semibold text-muted hover:text-parchment hover:border-white/30 transition-colors"

@@ -160,7 +160,7 @@ export default async function AdminPage({
             </h1>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2.5">
             <Link
               href="/admin/voters"
               className="rounded-full border border-white/15 bg-char px-5 py-2 text-xs font-semibold text-parchment hover:border-gold/50 transition-colors"
@@ -235,26 +235,37 @@ export default async function AdminPage({
 
                     return (
                       <div key={nominee.id} className="group flex flex-col gap-1.5">
-                        <div className="flex items-center justify-between text-sm">
-                          <div className="flex items-center gap-2 min-w-0">
-                            <span className="font-mono text-xs text-muted">
+                        <div className="flex items-start sm:items-center justify-between text-sm gap-2">
+                          <div className="flex items-start sm:items-center gap-2.5 min-w-0">
+                            <span className="font-mono text-xs text-muted font-semibold mt-0.5 sm:mt-0">
                               {idx + 1}.
                             </span>
-                            <span className="font-semibold text-parchment truncate">
-                              {nominee.name}
-                            </span>
-                            {nominee.subtitle && (
-                              <span className="text-xs text-muted truncate">
-                                ({nominee.subtitle})
-                              </span>
+                            {nominee.imageUrl && (
+                              <img
+                                src={nominee.imageUrl}
+                                alt={nominee.name}
+                                className="h-6 w-6 rounded-full object-cover border border-white/10 shrink-0 mt-0.5 sm:mt-0"
+                              />
                             )}
-                            {isLeader && (
-                              <span className="rounded-full bg-gold-deep/20 border border-gold-deep/60 px-2 py-0.5 text-[10px] font-bold text-gold-light uppercase tracking-wider">
-                                Leader 🏆
-                              </span>
-                            )}
+                            <div className="min-w-0">
+                              <div className="flex flex-wrap items-center gap-1.5">
+                                <span className="font-semibold text-parchment truncate">
+                                  {nominee.name}
+                                </span>
+                                {isLeader && (
+                                  <span className="rounded-full bg-gold-deep/20 border border-gold-deep/60 px-2 py-0.5 text-[9px] font-bold text-gold-light uppercase tracking-wider shrink-0">
+                                    Leader 🏆
+                                  </span>
+                                )}
+                              </div>
+                              {nominee.subtitle && (
+                                <span className="block text-[11px] text-muted truncate mt-0.5">
+                                  ({nominee.subtitle})
+                                </span>
+                              )}
+                            </div>
                           </div>
-                          <div className="flex items-center gap-3 font-mono text-xs">
+                          <div className="flex items-center gap-3 font-mono text-xs shrink-0 text-right mt-0.5 sm:mt-0">
                             <span className="text-muted">{nominee.votes} votes</span>
                             <span className="text-gold-light font-bold">
                               {nominee.percentage}%

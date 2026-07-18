@@ -26,16 +26,25 @@ export function NomineeCard({
           : "border-white/10 bg-char hover:border-gold-deep/50 hover:bg-charLight",
       ].join(" ")}
     >
-      <span
+      {/* Photo Avatar or Initials Badge */}
+      <div
         className={[
-          "flex h-12 w-12 shrink-0 items-center justify-center rounded-full font-display text-lg border",
+          "flex h-12 w-12 shrink-0 items-center justify-center rounded-full font-display text-lg border overflow-hidden relative transition-colors",
           selected
             ? "border-gold text-gold-light bg-ink"
-            : "border-white/15 text-muted bg-ink/60 group-hover:text-parchment",
+            : "border-white/15 text-muted bg-ink/60 group-hover:text-parchment group-hover:border-gold-deep/50",
         ].join(" ")}
       >
-        {initial}
-      </span>
+        {nominee.imageUrl ? (
+          <img
+            src={nominee.imageUrl}
+            alt={nominee.name}
+            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110"
+          />
+        ) : (
+          initial
+        )}
+      </div>
 
       <span className="flex-1 min-w-0">
         <span
@@ -51,6 +60,7 @@ export function NomineeCard({
         )}
       </span>
 
+      {/* Selection Checkbox Ring */}
       <span
         className={[
           "shrink-0 h-5 w-5 rounded-full border-2 flex items-center justify-center transition-colors",
