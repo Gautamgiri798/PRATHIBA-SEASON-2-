@@ -1,0 +1,13 @@
+node_modules
+.next
+.env
+.env.local
+out
+*.log
+.DS_Store
+
+# Local SQLite Database files
+*.db
+*.db-journal
+*.db-shm
+*.db-wal
