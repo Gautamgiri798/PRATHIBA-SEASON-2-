@@ -74,8 +74,10 @@ graph TD
 *   **User Action**: Review selected nominees alongside their photo avatars and click **Submit**.
 *   **Transaction Block**: Next.js API route (`app/api/vote/route.ts`) takes the ballot, opens a transaction in SQLite, checks that the contact has not voted yet (due to the `voters.contact` unique constraint), inserts the registration details, increments the nominee tallies, and commits the records.
 
-### 4. Admin Inspection
+### 4. Admin Inspection & Voting Controls
 *   **Results Panel (`/admin`)**: Admins authenticate using `ADMIN_PASSCODE` (default `admin123`). This issues a secure HTTP-only cookie. The dashboard renders live metrics and nominee ranking bars.
+*   **Voter Window Controls**: Authenticated admins can manually start and stop/pause the voting process, or set a target date-time deadline. 
+*   **Live Countdown**: When a deadline is set, both admins and voters see a live pulsing countdown timer. Once the deadline passes (or if voting is manually stopped), users are blocked from voting and redirected to a "Voting Closed" page.
 *   **Data Logs (`/admin/voters`)**: Displays detailed voter lists in a separate logs grid. Timestamps are formatted to India Standard Time (IST) for easy reference.
 
 ---

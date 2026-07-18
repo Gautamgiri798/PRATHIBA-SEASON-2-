@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { db } from "@/lib/db";
+import { db, getSetting } from "@/lib/db";
 import { normalizeContact, ContactType } from "@/lib/validate";
 import { CATEGORIES } from "@/lib/categories";
 import crypto from "crypto";
@@ -36,6 +36,27 @@ const castVoteTransaction = db.transaction(
 );
 
 export async function POST(req: NextRequest) {
+  // Verify server-side voting state configuration
+  const votingActive = getSetting("voting_active") === "true";
+  const votingEndsAt = getSetting("voting_ends_at");
+
+  if (!votingActive) {
+    return NextResponse.json(
+      { error: "Voting is currently stopped or has not started yet." },
+      { status: 403 }
+    );
+  }
+
+  if (votingEndsAt) {
+    const endsDate = new Date(votingEndsAt);
+    if (new Date() > endsDate) {
+      return NextResponse.json(
+        { error: "Voting has closed. The deadline has already passed." },
+        { status: 403 }
+      );
+    }
+  }
+
   let body: {
     name?: string;
     contact?: string;

@@ -1,4 +1,4 @@
-import { db } from "@/lib/db";
+import { db, getSetting } from "@/lib/db";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import Link from "next/link";
@@ -22,6 +22,17 @@ export default async function VotersReportPage() {
   if (!isAuthorized) {
     redirect("/admin");
   }
+
+  const votingActive = getSetting("voting_active") === "true";
+  const votingEndsAt = getSetting("voting_ends_at");
+
+  const deadlineIST = votingEndsAt 
+    ? new Date(votingEndsAt).toLocaleString("en-IN", {
+        timeZone: "Asia/Kolkata",
+        dateStyle: "medium",
+        timeStyle: "short",
+      })
+    : "No deadline set";
 
   // Server Action to clear cookie and log out
   async function handleLogout() {
@@ -59,12 +70,12 @@ export default async function VotersReportPage() {
             >
               Back to Dashboard
             </Link>
-            <Link
+            <a
               href="/admin/voters"
               className="rounded-full border border-white/15 bg-char px-5 py-2 text-xs font-semibold text-parchment hover:border-gold/50 transition-colors"
             >
               Refresh
-            </Link>
+            </a>
             <form action={handleLogout}>
               <button
                 type="submit"
@@ -73,6 +84,19 @@ export default async function VotersReportPage() {
                 Logout
               </button>
             </form>
+          </div>
+        </div>
+
+        {/* Voting Status Banner */}
+        <div className="mt-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 rounded-lg border border-gold-deep/30 bg-char px-4 py-3 text-xs sm:text-sm text-parchment/90 font-mono">
+          <div className="flex items-center gap-2">
+            <span className={`h-2.5 w-2.5 rounded-full ${votingActive ? "bg-emerald animate-pulse" : "bg-maroon-light"}`} />
+            <span>
+              Status: <strong className={votingActive ? "text-emerald" : "text-maroon-light"}>{votingActive ? "Active" : "Stopped/Closed"}</strong>
+            </span>
+          </div>
+          <div>
+            <span>Deadline (IST): <strong>{deadlineIST}</strong></span>
           </div>
         </div>
 
@@ -140,9 +164,7 @@ export default async function VotersReportPage() {
           )}
         </div>
 
-        <div className="mt-12 text-center text-xs text-muted">
-          Pratibha Season 2 Awards · Results updated dynamically from SQLite database.
-        </div>
+
       </div>
     </main>
   );

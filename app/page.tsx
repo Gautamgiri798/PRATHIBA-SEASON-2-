@@ -23,10 +23,79 @@ export default function Page() {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [alreadyVotedLocally, setAlreadyVotedLocally] = useState(false);
 
+  // Voting window controls state
+  const [settings, setSettings] = useState<{ active: boolean; endsAt: string | null; serverTime: string } | null>(null);
+  const [timeRemaining, setTimeRemaining] = useState<string | null>(null);
+  const [isClosed, setIsClosed] = useState(false);
+  const [isNotStarted, setIsNotStarted] = useState(false);
+
   useEffect(() => {
     if (typeof window !== "undefined") {
       setAlreadyVotedLocally(window.localStorage.getItem(LOCAL_FLAG) === "1");
     }
+  }, []);
+
+  useEffect(() => {
+    async function fetchSettings() {
+      try {
+        const res = await fetch("/api/settings");
+        if (res.ok) {
+          const data = await res.json();
+          setSettings(data);
+
+          if (!data.active) {
+            if (data.endsAt) {
+              setIsClosed(true);
+            } else {
+              setIsNotStarted(true);
+            }
+            return;
+          }
+
+          if (data.endsAt) {
+            const endsTime = new Date(data.endsAt).getTime();
+            const serverTime = new Date(data.serverTime).getTime();
+            const timeDiff = serverTime - Date.now(); // local offset
+
+            const updateTimer = () => {
+              const nowAdjusted = Date.now() + timeDiff;
+              const remaining = endsTime - nowAdjusted;
+
+              if (remaining <= 0) {
+                setTimeRemaining("00h 00m 00s");
+                setIsClosed(true);
+                return true; // stop timer
+              }
+
+              const days = Math.floor(remaining / (1000 * 60 * 60 * 24));
+              const hours = Math.floor((remaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+              const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+              const seconds = Math.floor((remaining % (1000 * 60)) / 1000);
+
+              let timeStr = "";
+              if (days > 0) {
+                timeStr += `${String(days).padStart(2, "0")}d `;
+              }
+              timeStr += `${String(hours).padStart(2, "0")}h ${String(minutes).padStart(2, "0")}m ${String(seconds).padStart(2, "0")}s`;
+              setTimeRemaining(timeStr);
+              return false;
+            };
+
+            const stopped = updateTimer();
+            if (!stopped) {
+              const interval = setInterval(() => {
+                const s = updateTimer();
+                if (s) clearInterval(interval);
+              }, 1000);
+              return () => clearInterval(interval);
+            }
+          }
+        }
+      } catch (err) {
+        console.error("Failed to load settings:", err);
+      }
+    }
+    fetchSettings();
   }, []);
 
   const votedIds = useMemo(() => new Set(Object.keys(votes)), [votes]);
@@ -102,10 +171,45 @@ export default function Page() {
     }
   }
 
+  if (settings && (isClosed || isNotStarted)) {
+    return (
+      <main className="min-h-screen bg-ink relative flex items-center justify-center px-4">
+        <div className="pointer-events-none fixed inset-0 bg-radial-glow" />
+        <div className="relative w-full max-w-md rounded-xl border border-gold-deep/30 bg-char p-6 sm:p-8 text-center shadow-gold animate-rise">
+          <Eyebrow>Pratibha Season 2 Awards</Eyebrow>
+          <div className="mt-6">
+            <TrophyMark />
+          </div>
+          <h1 className="mt-4 font-display font-black text-3xl text-gold-gradient leading-none">
+            VOTING {isClosed ? "CLOSED" : "NOT STARTED"}
+          </h1>
+          <p className="mt-4 text-sm text-muted">
+            {isClosed 
+              ? "The voting phase has ended. Thank you for your participation!"
+              : "Voting hasn't started yet. Please check back later."}
+          </p>
+          <div className="mt-6 border-t border-white/5 pt-4">
+            <Link href="/admin" className="text-xs text-muted hover:text-gold underline">
+              Admin Portal
+            </Link>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
   return (
     <main className="min-h-screen bg-ink relative">
       <div className="pointer-events-none fixed inset-0 bg-radial-glow" />
       <div className="relative mx-auto max-w-3xl px-4 sm:px-6 py-8 sm:py-14">
+        {/* Countdown Banner */}
+        {timeRemaining && (
+          <div className="mb-6 rounded-lg border border-gold/30 bg-gold-deep/10 px-4 py-2.5 text-center text-xs sm:text-sm font-mono text-gold-light animate-pulse shadow-sm flex items-center justify-center gap-2">
+            <span>⏳</span>
+            <span>Voting Ends In: <strong className="font-semibold">{timeRemaining}</strong></span>
+          </div>
+        )}
+
         {step === "landing" && <Landing onStart={() => setStep("identity")} />}
 
         {step === "identity" && (

@@ -1,4 +1,4 @@
-import { db } from "@/lib/db";
+import { db, getSetting, setSetting } from "@/lib/db";
 import { CATEGORIES } from "@/lib/categories";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
@@ -49,6 +49,27 @@ export default async function AdminPage({
     "use server";
     const store = cookies();
     store.delete("admin_session");
+    redirect("/admin");
+  }
+
+  // Server Action to update voting controls settings in SQLite
+  async function updateVotingSettings(formData: FormData) {
+    "use server";
+    const active = formData.get("active")?.toString();
+    const endsAt = formData.get("ends_at")?.toString();
+
+    if (active !== undefined) {
+      setSetting("voting_active", active);
+    }
+    if (endsAt !== undefined) {
+      if (endsAt) {
+        // Convert datetime-local string (YYYY-MM-DDTHH:MM) to ISO string
+        const isoDate = new Date(endsAt).toISOString();
+        setSetting("voting_ends_at", isoDate);
+      } else {
+        setSetting("voting_ends_at", "");
+      }
+    }
     redirect("/admin");
   }
 
@@ -103,6 +124,25 @@ export default async function AdminPage({
   }
 
   // Render Admin Dashboard if authorized
+  const votingActive = getSetting("voting_active") === "true";
+  const votingEndsAt = getSetting("voting_ends_at");
+
+  let defaultEndsAtLocal = "";
+  if (votingEndsAt) {
+    const d = new Date(votingEndsAt);
+    const offset = d.getTimezoneOffset() * 60000;
+    const localDate = new Date(d.getTime() - offset);
+    defaultEndsAtLocal = localDate.toISOString().slice(0, 16);
+  }
+
+  const deadlineIST = votingEndsAt 
+    ? new Date(votingEndsAt).toLocaleString("en-IN", {
+        timeZone: "Asia/Kolkata",
+        dateStyle: "medium",
+        timeStyle: "short",
+      })
+    : "No deadline set";
+
   const totalVotersRow = db.prepare("SELECT count(*) as count FROM voters").get() as { count: number } | undefined;
   const totalVoters = totalVotersRow?.count ?? 0;
 
@@ -167,12 +207,12 @@ export default async function AdminPage({
             >
               Voter Logs
             </Link>
-            <Link
+            <a
               href="/admin"
               className="rounded-full border border-white/15 bg-char px-5 py-2 text-xs font-semibold text-muted hover:text-parchment hover:border-white/30 transition-colors"
             >
               Refresh
-            </Link>
+            </a>
             <form action={handleLogout}>
               <button
                 type="submit"
@@ -201,6 +241,93 @@ export default async function AdminPage({
             <p className="mt-1 text-3xl font-display font-bold text-gold-light">
               {(totalVoters * CATEGORIES.length).toLocaleString()}
             </p>
+         </div>
+        </div>
+
+        {/* Voting Phase Control Card */}
+        <div className="mt-8 rounded-xl border border-gold-deep/30 bg-char p-5 sm:p-6 shadow-gold animate-rise">
+          <div className="border-b border-white/5 pb-3 mb-4 flex items-center justify-between">
+            <div>
+              <span className="font-mono text-xs text-gold-deep uppercase tracking-widest">
+                Voting Controls
+              </span>
+              <h2 className="mt-1 font-display text-xl text-parchment font-semibold">
+                Configure Voting Window
+              </h2>
+            </div>
+            <span className="font-mono text-xs text-muted">
+              Only visible to Admins
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Status Panel */}
+            <div className="space-y-4">
+              <div>
+                <p className="text-xs text-muted uppercase font-mono">Current Status</p>
+                <div className="mt-1 flex items-center gap-2">
+                  <span className={`h-2.5 w-2.5 rounded-full ${votingActive ? "bg-emerald animate-pulse" : "bg-maroon-light"}`} />
+                  <span className={`font-semibold ${votingActive ? "text-emerald" : "text-maroon-light"}`}>
+                    {votingActive ? "Ballot is ACTIVE" : "Ballot is STOPPED / CLOSED"}
+                  </span>
+                </div>
+              </div>
+
+              <div>
+                <p className="text-xs text-muted uppercase font-mono">Active Deadline (IST)</p>
+                <p className="mt-1 font-body text-parchment font-semibold">
+                  {deadlineIST}
+                </p>
+              </div>
+
+              {/* Toggle Ballot Status Form */}
+              <form action={updateVotingSettings}>
+                <input type="hidden" name="active" value={votingActive ? "false" : "true"} />
+                <button
+                  type="submit"
+                  className={`w-full sm:w-auto rounded-full px-6 py-2.5 text-xs font-bold transition-all hover:scale-[1.01] active:scale-[0.99] ${
+                    votingActive 
+                      ? "bg-maroon hover:bg-maroon-light text-parchment border border-maroon-light/20" 
+                      : "bg-gold-gradient text-ink"
+                  }`}
+                >
+                  {votingActive ? "Pause / Stop Voting" : "Start / Activate Voting"}
+                </button>
+              </form>
+            </div>
+
+            {/* Deadline Panel */}
+            <div className="border-t md:border-t-0 md:border-l border-white/5 pt-6 md:pt-0 md:pl-6 space-y-4">
+              <p className="text-xs text-muted uppercase font-mono">Set/Modify Deadline</p>
+              
+              <form action={updateVotingSettings} className="space-y-3">
+                <input
+                  type="datetime-local"
+                  name="ends_at"
+                  defaultValue={defaultEndsAtLocal}
+                  className="w-full rounded-lg border border-white/15 bg-ink/70 px-4 py-2.5 text-sm text-parchment outline-none focus:border-gold"
+                />
+                
+                <div className="flex gap-2">
+                  <button
+                    type="submit"
+                    className="flex-1 rounded-full border border-gold/30 bg-gold-deep/15 hover:bg-gold-deep/30 px-4 py-2 text-xs font-semibold text-gold-light transition-colors"
+                  >
+                    Save Deadline
+                  </button>
+                  {votingEndsAt && (
+                    <button
+                      type="submit"
+                      name="ends_at"
+                      value=""
+                      className="rounded-full border border-white/15 bg-char px-4 py-2 text-xs font-semibold text-muted hover:text-parchment hover:border-white/30 transition-colors"
+                    >
+                      Clear
+                    </button>
+                  )}
+                </div>
+              </form>
+            </div>
           </div>
         </div>
 
@@ -292,9 +419,7 @@ export default async function AdminPage({
           })}
         </div>
 
-        <div className="mt-12 text-center text-xs text-muted">
-          Pratibha Season 2 Awards · Results updated dynamically from SQLite database.
-        </div>
+
       </div>
     </main>
   );

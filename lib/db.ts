@@ -61,4 +61,34 @@ db.exec(`
   FROM votes
   GROUP BY category_id, nominee_id
   ORDER BY category_id, votes DESC;
+
+  CREATE TABLE IF NOT EXISTS settings (
+    key TEXT PRIMARY KEY,
+    value TEXT
+  );
 `);
+
+// Seed default settings if they do not exist
+db.exec(`
+  INSERT OR IGNORE INTO settings (key, value) VALUES ('voting_active', 'true');
+  INSERT OR IGNORE INTO settings (key, value) VALUES ('voting_ends_at', '');
+`);
+
+export function getSetting(key: string): string {
+  try {
+    const row = db.prepare("SELECT value FROM settings WHERE key = ?").get(key) as { value: string } | undefined;
+    return row?.value ?? "";
+  } catch (e) {
+    console.warn(`Failed to get setting ${key}:`, e);
+    return "";
+  }
+}
+
+export function setSetting(key: string, value: string): void {
+  try {
+    db.prepare("INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)").run(key, value);
+  } catch (e) {
+    console.warn(`Failed to set setting ${key} to ${value}:`, e);
+  }
+}
+
