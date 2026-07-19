@@ -1,0 +1,20 @@
+services:
+  voting-system:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: pratibha-voting-system
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - ADMIN_PASSCODE=admin123   # Change this passcode in production!
+      - DATABASE_URL=/app/data/votes.db
+    volumes:
+      # Mount named volume to persist SQLite data when container restarts/rebuilds
+      - sqlite-data:/app/data
+    restart: always
+
+volumes:
+  sqlite-data:
+    driver: local

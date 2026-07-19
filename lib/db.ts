@@ -5,7 +5,9 @@ declare global {
   var sqliteDb: Database.Database | undefined;
 }
 
-const dbPath = path.resolve(process.cwd(), "votes.db");
+const dbPath = process.env.DATABASE_URL 
+  ? path.resolve(process.env.DATABASE_URL) 
+  : path.resolve(process.cwd(), "votes.db");
 
 // Cache the database connection globally in development to prevent hot reloading 
 // from creating multiple connections.

@@ -14,6 +14,17 @@ An elegant, secure, and mobile-responsive digital voting system designed for the
 
 ---
 
+## 🛠️ Tech Stack
+
+*   **Framework**: [Next.js 14](https://nextjs.org/) (App Router)
+*   **Language**: [TypeScript](https://www.typescriptlang.org/)
+*   **Frontend & Styling**: [React 18](https://react.dev/), [Tailwind CSS](https://tailwindcss.com/), Glassmorphism UI & custom CSS animations
+*   **Database**: [SQLite](https://www.sqlite.org/) via [`better-sqlite3`](https://github.com/WiseLibs/better-sqlite3) (atomic transactions & automatic schema migrations)
+*   **Containerization**: [Docker](https://www.docker.com/) & Docker Compose (Multi-stage production build on `node:20-slim`)
+*   **Authentication & Security**: Passcode gatekeeper with HTTP-Only cookie session management
+
+---
+
 ## 📁 Folder Structure
 
 ```text

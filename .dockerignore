@@ -1,0 +1,14 @@
+node_modules
+.next
+out
+.git
+.gitignore
+*.db
+*.db-journal
+*.db-shm
+*.db-wal
+.env
+.env.local
+README.md
+deployment.md
+tsconfig.tsbuildinfo
