@@ -1,0 +1,24 @@
+# Render Blueprint Infrastructure as Code
+# Deploys PostgreSQL 16 Database + Next.js Web Service automatically
+
+services:
+  - type: web
+    name: pratibha-voting-system
+    env: docker
+    plan: free
+    dockerfilePath: Dockerfile
+    envVars:
+      - key: PORT
+        value: 3000
+      - key: ADMIN_PASSCODE
+        sync: false # Set your secure admin passcode in Render dashboard
+      - key: DATABASE_URL
+        fromDatabase:
+          name: pratibha-postgres
+          property: connectionString
+
+databases:
+  - name: pratibha-postgres
+    databaseName: pratibha_db
+    user: postgres
+    plan: free
