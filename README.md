@@ -8,7 +8,7 @@ An elegant, secure, and mobile-responsive digital voting system designed for the
 
 *   **Responsive Voting Flow**: Seamless 3-step wizard (Verify Identity → Cast Votes across 10 Categories → Review & Submit).
 *   **Film Reel Progress Strip**: A visual negative film strip acting as a progress bar, rendering category poster thumbnails that light up as the user votes.
-*   **Local SQLite Database**: A self-contained database (`votes.db`) with auto-migrated schemas and atomic database transactions.
+*   **PostgreSQL Database**: Production-ready relational database integration using connection pooling (`pg`), auto-migrated schemas, and atomic SQL transactions.
 *   **Secure Administration Dashboard**: Gatekeeper passcode login, HTTP-only cookie session management, live results leaderboards with dynamic percentage share progress bars, and leading indicators.
 *   **Segmented Voter Reports**: A separate, paginated logs view for admins to view voter registry details (Names, Mobile/Email, timestamps) in Indian Standard Time (IST).
 
@@ -19,8 +19,8 @@ An elegant, secure, and mobile-responsive digital voting system designed for the
 *   **Framework**: [Next.js 14](https://nextjs.org/) (App Router)
 *   **Language**: [TypeScript](https://www.typescriptlang.org/)
 *   **Frontend & Styling**: [React 18](https://react.dev/), [Tailwind CSS](https://tailwindcss.com/), Glassmorphism UI & custom CSS animations
-*   **Database**: [SQLite](https://www.sqlite.org/) via [`better-sqlite3`](https://github.com/WiseLibs/better-sqlite3) (atomic transactions & automatic schema migrations)
-*   **Containerization**: [Docker](https://www.docker.com/) & Docker Compose (Multi-stage production build on `node:20-slim`)
+*   **Database**: [PostgreSQL](https://www.postgresql.org/) via [`pg`](https://node-postgres.com/) (connection pooling, atomic transactions & automatic schema migrations)
+*   **Containerization**: [Docker](https://www.docker.com/) & Docker Compose (`postgres:16-alpine` + `node:20-slim`)
 *   **Authentication & Security**: Passcode gatekeeper with HTTP-Only cookie session management
 
 ---
@@ -36,7 +36,7 @@ pratibha-season-2-awards/
 │   │       └── page.tsx
 │   ├── api/
 │   │   └── vote/
-│   │       └── route.ts        # Vote receiver & SQLite transaction API
+│   │       └── route.ts        # Vote receiver & PostgreSQL transaction API
 │   ├── globals.css             # Glassmorphic themes & gold gradients
 │   ├── layout.tsx
 │   └── page.tsx                # Multi-step voter wizard
@@ -45,13 +45,14 @@ pratibha-season-2-awards/
 │   └── NomineeCard.tsx         # Nominee details & image display card
 ├── lib/                        # Backend Helpers & Constants
 │   ├── categories.ts           # Categories config & Nominees registry
-│   ├── db.ts                   # SQLite client, schema creator & migrator
+│   ├── db.ts                   # PostgreSQL client pool, schema migrator & async queries
 │   └── validate.ts             # Contact details validator & formatter
-├── public/                     # Static Local Assets (create to customize images)
+├── public/                     # Static Local Assets (nominee photos & category cards)
 │   ├── nominees/               # Place candidate portraits here
 │   └── categories/             # Place progress bar category cards here
-├── .env.example                # Admin credentials configuration template
-├── .gitignore                  # Keeps your votes.db local & secure
+├── .env.example                # Admin passcode & DATABASE_URL template
+├── Dockerfile                  # Multi-stage Docker production builder
+├── docker-compose.yml          # PostgreSQL 16 + Next.js App Compose definition
 ├── package.json
 ├── README.md                   # Platform documentation
 └── tsconfig.json
@@ -83,7 +84,7 @@ graph TD
 
 ### 3. Submission Phase (Step 3 of 3)
 *   **User Action**: Review selected nominees alongside their photo avatars and click **Submit**.
-*   **Transaction Block**: Next.js API route (`app/api/vote/route.ts`) takes the ballot, opens a transaction in SQLite, checks that the contact has not voted yet (due to the `voters.contact` unique constraint), inserts the registration details, increments the nominee tallies, and commits the records.
+*   **Transaction Block**: Next.js API route (`app/api/vote/route.ts`) takes the ballot, opens a transaction in PostgreSQL, checks that the contact has not voted yet (due to the `voters.contact` unique constraint), inserts the registration details, increments the nominee tallies, and commits the records.
 
 ### 4. Admin Inspection & Voting Controls
 *   **Results Panel (`/admin`)**: Admins authenticate using `ADMIN_PASSCODE` (default `admin123`). This issues a secure HTTP-only cookie. The dashboard renders live metrics and nominee ranking bars.
@@ -95,31 +96,36 @@ graph TD
 
 ## 🚀 Getting Started
 
-### 1. Local Installation
-Make sure you have Node.js installed, then clone and launch the project:
+### 1. Docker Compose (Recommended)
+Launch both the **PostgreSQL 16** database container and the **Next.js Web Application** using Docker Desktop:
 
 ```bash
-# Install node packages
+# Build and run containers in detached mode
+docker compose up --build -d
+```
+* **Web App**: [http://localhost:3000](http://localhost:3000)
+* **Admin Panel**: [http://localhost:3000/admin](http://localhost:3000/admin) (Passcode: `admin123`)
+
+### 2. Local Node.js Development
+If running directly on your host machine, ensure you have a running PostgreSQL instance:
+
+```bash
+# 1. Create .env.local file with your PostgreSQL DATABASE_URL
+ADMIN_PASSCODE=admin123
+DATABASE_URL=postgres://postgres:postgrespassword@localhost:5432/pratibha_db
+
+# 2. Install dependencies
 npm install
 
-# Run dev server
+# 3. Run dev server
 npm run dev
 ```
-Open [http://localhost:3000](http://localhost:3000) in your browser.
-
-### 2. Testing on Real Devices (Mobile Wi-Fi)
-To test responsiveness and vote inputs directly from your smartphone, run the dev server binding to all network interfaces:
-
-```bash
-npm run dev -- --hostname 0.0.0.0
-```
-Then find your computer's local IP address (`ipconfig` on Windows) and open `http://<your-ip>:3000` on your phone's browser.
 
 ### 3. Database Administration
-To inspect database records directly from your console:
+To inspect PostgreSQL vote records directly from your console:
 ```bash
-# Query the live vote tallies table
-sqlite3 votes.db "select * from vote_tallies;"
+# Query the live vote tallies table inside the Docker container
+docker exec -it pratibha-postgres psql -U postgres -d pratibha_db -c "SELECT * FROM vote_tallies;"
 ```
 
 ---
@@ -127,10 +133,9 @@ sqlite3 votes.db "select * from vote_tallies;"
 ## 🎨 Asset Customization
 
 ### Local Images
-To replace the Unsplash stock pictures with your official nominees and category assets:
-1.  Create a `public/` directory in your root folder.
-2.  Save your images under `public/nominees/` and `public/categories/`.
-3.  Open `lib/categories.ts` and set the paths (starting with `/` since `public` is the root asset directory):
+To replace stock pictures with official nominees and category assets:
+1. Save your images under `public/nominees/` and `public/categories/`.
+2. Open `lib/categories.ts` and set the paths (starting with `/` since `public` is the root asset directory):
     ```typescript
     // In lib/categories.ts
     thumbnailUrl: "/categories/best-actor.jpg",
@@ -140,6 +145,6 @@ To replace the Unsplash stock pictures with your official nominees and category 
     ```
 
 ### Production Deployment
-Since SQLite stores information in a local `votes.db` file, standard serverless hosting (e.g. Vercel/Netlify) will lose database records when the worker container sleeps. 
-*   **Recommended**: Deploy to a VPS or PaaS provider with persistent volume mounts (like **Railway**, **Render**, or **Fly.io**).
-*   **Cloud SQL Alternative**: If you wish to host on Vercel, replace `better-sqlite3` with `@libsql/client` to connect to a cloud SQLite server like **Turso**.
+Since the application uses PostgreSQL, it can be deployed to any modern cloud platform:
+*   **Railway / Render**: Connect your GitHub repository. Set `DATABASE_URL` to a provisioned PostgreSQL instance and `ADMIN_PASSCODE`. Railway/Render will build the `Dockerfile` automatically.
+*   **Serverless Hosting (Vercel / Netlify)**: Provide a cloud PostgreSQL connection string (e.g. from **Supabase**, **Neon**, or **AWS RDS**) in your `DATABASE_URL` environment variable.
