@@ -1,4 +1,4 @@
-import { db, getSetting } from "@/lib/db";
+import { getSetting, getVotersList } from "@/lib/db";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import Link from "next/link";
@@ -23,8 +23,8 @@ export default async function VotersReportPage() {
     redirect("/admin");
   }
 
-  const votingActive = getSetting("voting_active") === "true";
-  const votingEndsAt = getSetting("voting_ends_at");
+  const votingActive = (await getSetting("voting_active")) === "true";
+  const votingEndsAt = await getSetting("voting_ends_at");
 
   const deadlineIST = votingEndsAt 
     ? new Date(votingEndsAt).toLocaleString("en-IN", {
@@ -42,10 +42,8 @@ export default async function VotersReportPage() {
     redirect("/admin");
   }
 
-  // Fetch voters list from SQLite
-  const votersList = db.prepare(
-    "SELECT name, contact, contact_type, created_at FROM voters ORDER BY created_at DESC"
-  ).all() as VoterRow[];
+  // Fetch voters list from PostgreSQL
+  const votersList = await getVotersList();
 
   return (
     <main className="min-h-screen bg-ink relative">

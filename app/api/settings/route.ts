@@ -4,8 +4,8 @@ import { getSetting } from "@/lib/db";
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  const votingActive = getSetting("voting_active") === "true";
-  const votingEndsAt = getSetting("voting_ends_at");
+  const votingActive = (await getSetting("voting_active")) === "true";
+  const votingEndsAt = await getSetting("voting_ends_at");
 
   return NextResponse.json({
     active: votingActive,

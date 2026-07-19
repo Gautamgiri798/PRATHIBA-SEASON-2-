@@ -1,4 +1,4 @@
-import { db, getSetting, setSetting } from "@/lib/db";
+import { getSetting, setSetting, getTotalVoters, getTallies } from "@/lib/db";
 import { CATEGORIES } from "@/lib/categories";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
@@ -52,22 +52,22 @@ export default async function AdminPage({
     redirect("/admin");
   }
 
-  // Server Action to update voting controls settings in SQLite
+  // Server Action to update voting controls settings in DB
   async function updateVotingSettings(formData: FormData) {
     "use server";
     const active = formData.get("active")?.toString();
     const endsAt = formData.get("ends_at")?.toString();
 
     if (active !== undefined) {
-      setSetting("voting_active", active);
+      await setSetting("voting_active", active);
     }
     if (endsAt !== undefined) {
       if (endsAt) {
         // Convert datetime-local string (YYYY-MM-DDTHH:MM) to ISO string
         const isoDate = new Date(endsAt).toISOString();
-        setSetting("voting_ends_at", isoDate);
+        await setSetting("voting_ends_at", isoDate);
       } else {
-        setSetting("voting_ends_at", "");
+        await setSetting("voting_ends_at", "");
       }
     }
     redirect("/admin");
@@ -124,8 +124,8 @@ export default async function AdminPage({
   }
 
   // Render Admin Dashboard if authorized
-  const votingActive = getSetting("voting_active") === "true";
-  const votingEndsAt = getSetting("voting_ends_at");
+  const votingActive = (await getSetting("voting_active")) === "true";
+  const votingEndsAt = await getSetting("voting_ends_at");
 
   let defaultEndsAtLocal = "";
   if (votingEndsAt) {
@@ -143,12 +143,8 @@ export default async function AdminPage({
       })
     : "No deadline set";
 
-  const totalVotersRow = db.prepare("SELECT count(*) as count FROM voters").get() as { count: number } | undefined;
-  const totalVoters = totalVotersRow?.count ?? 0;
-
-  const tallies = db.prepare(
-    "SELECT category_id, nominee_id, votes FROM vote_tallies"
-  ).all() as TallyRow[];
+  const totalVoters = await getTotalVoters();
+  const tallies = await getTallies();
 
   // Map votes by Category -> Nominee
   const tallyMap: Record<string, Record<string, number>> = {};

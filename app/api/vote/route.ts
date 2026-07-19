@@ -1,44 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
-import { db, getSetting } from "@/lib/db";
+import { castVoteTransaction, getSetting } from "@/lib/db";
 import { normalizeContact, ContactType } from "@/lib/validate";
 import { CATEGORIES } from "@/lib/categories";
-import crypto from "crypto";
 
 const VALID_CATEGORY_IDS = new Set(CATEGORIES.map((c) => c.id));
 const NOMINEE_IDS_BY_CATEGORY: Record<string, Set<string>> = Object.fromEntries(
   CATEGORIES.map((c) => [c.id, new Set(c.nominees.map((n) => n.id))])
 );
 
-// Prepare statement cache for optimized database execution
-const insertVoter = db.prepare(`
-  INSERT INTO voters (id, name, contact, contact_type)
-  VALUES (?, ?, ?, ?)
-`);
-
-const insertVote = db.prepare(`
-  INSERT INTO votes (id, voter_id, category_id, nominee_id)
-  VALUES (?, ?, ?, ?)
-`);
-
-// Local SQLite database transaction for atomic vote submissions
-const castVoteTransaction = db.transaction(
-  (name: string, contact: string, contactType: string, votes: Record<string, string>) => {
-    const voterId = crypto.randomUUID();
-    insertVoter.run(voterId, name, contact, contactType);
-
-    for (const [categoryId, nomineeId] of Object.entries(votes)) {
-      const voteId = crypto.randomUUID();
-      insertVote.run(voteId, voterId, categoryId, nomineeId);
-    }
-
-    return voterId;
-  }
-);
-
 export async function POST(req: NextRequest) {
   // Verify server-side voting state configuration
-  const votingActive = getSetting("voting_active") === "true";
-  const votingEndsAt = getSetting("voting_ends_at");
+  const votingActive = (await getSetting("voting_active")) === "true";
+  const votingEndsAt = await getSetting("voting_ends_at");
 
   if (!votingActive) {
     return NextResponse.json(
@@ -118,11 +91,16 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const voterId = castVoteTransaction(name.trim(), normalized, contactType, votes);
+    const voterId = await castVoteTransaction(name.trim(), normalized, contactType, votes);
     return NextResponse.json({ ok: true, voterId });
   } catch (error: any) {
-    // Catch SQLITE duplicate voter contact constraint
-    if (error.code === "SQLITE_CONSTRAINT_UNIQUE" || error.message?.includes("UNIQUE constraint failed")) {
+    // Catch PostgreSQL duplicate voter contact constraint (code '23505') or SQLite constraint
+    if (
+      error.code === "23505" ||
+      error.code === "SQLITE_CONSTRAINT_UNIQUE" ||
+      error.message?.includes("UNIQUE constraint failed") ||
+      error.message?.includes("duplicate key")
+    ) {
       return NextResponse.json(
         { error: "This mobile number / email has already voted. Only one vote is allowed per person." },
         { status: 409 }
