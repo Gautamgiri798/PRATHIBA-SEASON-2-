@@ -17,7 +17,7 @@ export type Category = {
 export const CATEGORIES: Category[] = [
   {
     id: "best-actor-music",
-    title: "Best Actor Male(Music Album)",
+    title: "Best Actor (Music Album)",
     group: "Music Awards",
     description: "Lead performance in a Sambalpuri music album.",
     thumbnailUrl: "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?auto=format&fit=crop&w=120&h=160&q=70",
@@ -58,96 +58,28 @@ export const CATEGORIES: Category[] = [
     nominees: [
       {
         id: "n1",
-        name: "Nominee 1",
-        imageUrl: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&h=150&q=80",
+        name: "Meenakshi",
+        imageUrl: "/nominees/Best Actress Female/Meenakshi.jpeg",
       },
       {
         id: "n2",
-        name: "Nominee 2",
-        imageUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&h=150&q=80",
+        name: "Monika Upadhyay",
+        imageUrl: "/nominees/Best Actress Female/Monika Upadhyay.jpeg",
       },
       {
         id: "n3",
-        name: "Nominee 3",
-        imageUrl: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=150&h=150&q=80",
+        name: "Lakita",
+        imageUrl: "/nominees/Best Actress Female/Lakita.jpeg",
       },
       {
         id: "n4",
-        name: "Nominee 4",
-        imageUrl: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=150&h=150&q=80",
+        name: "Riya Thakre",
+        imageUrl: "/nominees/Best Actress Female/Riya Thakre.jpeg",
       },
       {
         id: "n5",
-        name: "Nominee 5",
-        imageUrl: "https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?auto=format&fit=crop&w=150&h=150&q=80",
-      },
-    ],
-  },
-  {
-    id: "viral-song-of-the-year",
-    title: "Viral Song of the Year",
-    group: "Music Awards",
-    description: "The track that defined the year on every playlist.",
-    thumbnailUrl: "https://images.unsplash.com/photo-1487180142328-054b783fc471?auto=format&fit=crop&w=120&h=160&q=70",
-    nominees: [
-      {
-        id: "n1",
-        name: "Nominee 1",
-        imageUrl: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=150&h=150&q=80",
-      },
-      {
-        id: "n2",
-        name: "Nominee 2",
-        imageUrl: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=150&h=150&q=80",
-      },
-      {
-        id: "n3",
-        name: "Nominee 3",
-        imageUrl: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=150&h=150&q=80",
-      },
-      {
-        id: "n4",
-        name: "Nominee 4",
-        imageUrl: "https://images.unsplash.com/photo-1487180142328-054b783fc471?auto=format&fit=crop&w=150&h=150&q=80",
-      },
-      {
-        id: "n5",
-        name: "Nominee 5",
-        imageUrl: "https://images.unsplash.com/photo-1506157786151-b8491531f063?auto=format&fit=crop&w=150&h=150&q=80",
-      },
-    ],
-  },
-  {
-    id: "best-lyrics",
-    title: "Best Lyrics",
-    group: "Music Awards",
-    description: "Writing that gave a song its soul.",
-    thumbnailUrl: "https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=120&h=160&q=70",
-    nominees: [
-      {
-        id: "n1",
-        name: "Nominee 1",
-        imageUrl: "https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=150&h=150&q=80",
-      },
-      {
-        id: "n2",
-        name: "Nominee 2",
-        imageUrl: "https://images.unsplash.com/photo-1517842645767-c639042777db?auto=format&fit=crop&w=150&h=150&q=80",
-      },
-      {
-        id: "n3",
-        name: "Nominee 3",
-        imageUrl: "https://images.unsplash.com/photo-1471107340929-a87cd0f5b5f3?auto=format&fit=crop&w=150&h=150&q=80",
-      },
-      {
-        id: "n4",
-        name: "Nominee 4",
-        imageUrl: "https://images.unsplash.com/photo-1501504905252-473c47e087f8?auto=format&fit=crop&w=150&h=150&q=80",
-      },
-      {
-        id: "n5",
-        name: "Nominee 5",
-        imageUrl: "https://images.unsplash.com/photo-1516414447565-b14be0adf13e?auto=format&fit=crop&w=150&h=150&q=80",
+        name: "Kalpita Singh",
+        imageUrl: "/nominees/Best Actress Female/Kalpita Singh.jpeg",
       },
     ],
   },
@@ -160,28 +92,28 @@ export const CATEGORIES: Category[] = [
     nominees: [
       {
         id: "n1",
-        name: "Nominee 1",
-        imageUrl: "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&w=150&h=150&q=80",
+        name: "Pratap Sahu",
+        imageUrl: "/nominees/Best Singer Male/Pratap Sahu.jpeg",
       },
       {
         id: "n2",
-        name: "Nominee 2",
-        imageUrl: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=150&h=150&q=80",
+        name: "Amar Dash",
+        imageUrl: "/nominees/Best Singer Male/Amar Dash.jpeg",
       },
       {
         id: "n3",
-        name: "Nominee 3",
-        imageUrl: "https://images.unsplash.com/photo-1489980508314-941910ded1f4?auto=format&fit=crop&w=150&h=150&q=80",
+        name: "Remish Kumar",
+        imageUrl: "/nominees/Best Singer Male/Remish Kumar.jpeg",
       },
       {
         id: "n4",
-        name: "Nominee 4",
-        imageUrl: "https://images.unsplash.com/photo-1488161628813-04466f872be2?auto=format&fit=crop&w=150&h=150&q=80",
+        name: "Ankit Raj",
+        imageUrl: "/nominees/Best Singer Male/Ankit Raj.jpeg",
       },
       {
         id: "n5",
-        name: "Nominee 5",
-        imageUrl: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=150&h=150&q=80",
+        name: "Pratham Kumbhar",
+        imageUrl: "/nominees/Best Singer Male/Pratham Kumbhar.jpeg",
       },
     ],
   },
@@ -194,28 +126,23 @@ export const CATEGORIES: Category[] = [
     nominees: [
       {
         id: "n1",
-        name: "Nominee 1",
-        imageUrl: "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?auto=format&fit=crop&w=150&h=150&q=80",
+        name: "Soubhagyalaxmi Dash",
+        imageUrl: "/nominees/Best Singer Female/Soubhagyalaxmi Dash.jpeg",
       },
       {
         id: "n2",
-        name: "Nominee 2",
-        imageUrl: "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=150&h=150&q=80",
+        name: "Kiran Dash",
+        imageUrl: "/nominees/Best Singer Female/Kiran Dash.jpeg",
       },
       {
         id: "n3",
-        name: "Nominee 3",
-        imageUrl: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=150&h=150&q=80",
+        name: "Monika Sahu",
+        imageUrl: "/nominees/Best Singer Female/Monika Sahu.jpeg",
       },
       {
         id: "n4",
-        name: "Nominee 4",
-        imageUrl: "https://images.unsplash.com/photo-1491349174775-aa7edd81094a?auto=format&fit=crop&w=150&h=150&q=80",
-      },
-      {
-        id: "n5",
-        name: "Nominee 5",
-        imageUrl: "https://images.unsplash.com/photo-1525134479668-1bee5c7c6845?auto=format&fit=crop&w=150&h=150&q=80",
+        name: "Sonam Rani",
+        imageUrl: "/nominees/Best Singer Female/Sonam Rani.jpeg",
       },
     ],
   },
@@ -287,41 +214,7 @@ export const CATEGORIES: Category[] = [
       },
     ],
   },
-  {
-    id: "promising-face-of-the-year",
-    title: "Promising Face of the Year",
-    group: "Film Production Awards",
-    description: "A newcomer announcing themselves to the industry.",
-    thumbnailUrl: "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=120&h=160&q=70",
-    nominees: [
-      {
-        id: "n1",
-        name: "Nominee 1",
-        imageUrl: "https://images.unsplash.com/photo-1519345182560-3f2917c472ef?auto=format&fit=crop&w=150&h=150&q=80",
-      },
-      {
-        id: "n2",
-        name: "Nominee 2",
-        imageUrl: "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&w=150&h=150&q=80",
-      },
-      {
-        id: "n3",
-        name: "Nominee 3",
-        imageUrl: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=150&h=150&q=80",
-      },
-      {
-        id: "n4",
-        name: "Nominee 4",
-        imageUrl: "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=150&h=150&q=80",
-      },
-      {
-        id: "n5",
-        name: "Nominee 5",
-        imageUrl: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=150&h=150&q=80",
-      },
-    ],
-  },
-  {
+{
     id: "content-creator-of-the-year",
     title: "Content Creator of the Year",
     group: "Film Production Awards",
@@ -352,6 +245,41 @@ export const CATEGORIES: Category[] = [
         id: "n5",
         name: "Nominee 5",
         imageUrl: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=150&h=150&q=80",
+      },
+    ],
+  },
+
+ {
+    id: "best-actor/actress-in-comedy",
+    title: "Best Actor/Actress In Comedy",
+    group: "Film Production Awards",
+    description: "Digital storytelling that carried Sambalpuri culture online.",
+    thumbnailUrl: "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?auto=format&fit=crop&w=120&h=160&q=70",
+    nominees: [
+      {
+        id: "n1",
+        name: "Chandni Suna",
+        imageUrl: "/nominees/Best Actor,Actress in Comedy/Chandni Suna.jpeg",
+      },
+      {
+        id: "n2",
+        name: "Sumit",
+        imageUrl: "/nominees/Best Actor,Actress in Comedy/Sumit.jpeg",
+      },
+      {
+        id: "n3",
+        name: "Lokesh",
+        imageUrl: "/nominees/Best Actor,Actress in Comedy/Lokesh.jpeg",
+      },
+      {
+        id: "n4",
+        name: "Tankadhar",
+        imageUrl: "/nominees/Best Actor,Actress in Comedy/Tankadhar.jpeg",
+      },
+      {
+        id: "n5",
+        name: "Riya",
+        imageUrl: "/nominees/Best Actor,Actress in Comedy/Riya.jpeg",
       },
     ],
   },
