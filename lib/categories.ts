@@ -181,6 +181,40 @@ export const CATEGORIES: Category[] = [
     ],
   },
   {
+    id: "best-choreographer",
+    title: "Best Choreographer",
+    group: "Film Production Awards",
+    description: "Vision and creativity behind every performance.",
+    thumbnailUrl: "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?auto=format&fit=crop&w=120&h=160&q=70",
+    nominees: [
+      {
+        id: "n1",
+        name: "Aryan",
+        imageUrl: "/nominees/Best Choreographer/Aryan.jpeg",
+      },
+      {
+        id: "n2",
+        name: "Charan",
+        imageUrl: "/nominees/Best Choreographer/Charan.jpeg",
+      },
+      {
+        id: "n3",
+        name: "Kanheya",
+        imageUrl: "/nominees/Best Choreographer/Kanheya.jpeg",
+      },
+      {
+        id: "n4",
+        name: "Raju",
+        imageUrl: "/nominees/Best Choreographer/Raju.jpeg",
+      },
+      {
+        id: "n5",
+        name: "Karan",
+        imageUrl: "/nominees/Best Choreographer/Karan.jpeg",
+      },
+    ],
+  },
+  {
     id: "best-dop",
     title: "Best DOP",
     group: "Film Production Awards",
@@ -253,7 +287,7 @@ export const CATEGORIES: Category[] = [
     id: "best-actor/actress-in-comedy",
     title: "Best Actor/Actress In Comedy",
     group: "Film Production Awards",
-    description: "Digital storytelling that carried Sambalpuri culture online.",
+    description: "Bringing laughter to life with unforgettable performances.",
     thumbnailUrl: "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?auto=format&fit=crop&w=120&h=160&q=70",
     nominees: [
       {
