@@ -17,35 +17,35 @@ export type Category = {
 export const CATEGORIES: Category[] = [
   {
     id: "best-actor-music",
-    title: "Best Actor (Music Album)",
+    title: "Best Actor Male(Music Album)",
     group: "Music Awards",
     description: "Lead performance in a Sambalpuri music album.",
     thumbnailUrl: "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?auto=format&fit=crop&w=120&h=160&q=70",
     nominees: [
       {
         id: "n1",
-        name: "Nominee 1",
-        imageUrl: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=150&h=150&q=80",
+        name: "Ankit Pattnaik",
+        imageUrl: "/nominees/Best Actor Male/Ankit Pattnaik.jpeg",
       },
       {
         id: "n2",
-        name: "Nominee 2",
-        imageUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&h=150&q=80",
+        name: "Jeet Suna",
+        imageUrl: "/nominees/Best Actor Male/Jeet Suna.jpeg",
       },
       {
         id: "n3",
-        name: "Nominee 3",
-        imageUrl: "https://images.unsplash.com/photo-1500048993953-d23a436266cf?auto=format&fit=crop&w=150&h=150&q=80",
+        name: "Pradeep Bhoi",
+        imageUrl: "/nominees/Best Actor Male/Pradeep Bhoi.jpeg",
       },
       {
         id: "n4",
-        name: "Nominee 4",
-        imageUrl: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=150&h=150&q=80",
+        name: "Bikash Gosain",
+        imageUrl: "/nominees/Best Actor Male/Bikash Gosain.jpeg",
       },
       {
         id: "n5",
-        name: "Nominee 5",
-        imageUrl: "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?auto=format&fit=crop&w=150&h=150&q=80",
+        name: "Pinku",
+        imageUrl: "/nominees/Best Actor Male/Pinku.jpeg",
       },
     ],
   },

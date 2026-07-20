@@ -29,9 +29,9 @@ export function NomineeCard({
       {/* Photo Avatar or Initials Badge */}
       <div
         className={[
-          "flex h-12 w-12 shrink-0 items-center justify-center rounded-full font-display text-lg border overflow-hidden relative transition-colors",
+          "flex w-24 h-28 sm:w-28 sm:h-32 shrink-0 items-center justify-center rounded-xl font-display text-2xl font-bold border-2 overflow-hidden relative transition-colors shadow-lg bg-ink",
           selected
-            ? "border-gold text-gold-light bg-ink"
+            ? "border-gold text-gold-light bg-ink shadow-gold/20"
             : "border-white/15 text-muted bg-ink/60 group-hover:text-parchment group-hover:border-gold-deep/50",
         ].join(" ")}
       >
@@ -39,7 +39,7 @@ export function NomineeCard({
           <img
             src={nominee.imageUrl}
             alt={nominee.name}
-            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110"
+            className="h-full w-full object-cover object-top transition-transform duration-300 group-hover:scale-105"
           />
         ) : (
           initial

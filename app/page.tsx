@@ -568,7 +568,7 @@ function ReviewStep({
                   <img
                     src={nominee.imageUrl}
                     alt={nominee.name}
-                    className="h-8 w-8 rounded-full object-cover border border-white/10 shrink-0"
+                    className="w-14 h-16 rounded-xl object-cover object-top border-2 border-gold-deep/40 shrink-0 shadow-sm"
                   />
                 )}
                 <div className="min-w-0">

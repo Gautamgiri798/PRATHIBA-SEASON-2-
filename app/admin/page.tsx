@@ -198,21 +198,27 @@ export default async function AdminPage({
 
           <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2.5">
             <Link
-              href="/admin/voters"
-              className="rounded-full border border-white/15 bg-char px-5 py-2 text-xs font-semibold text-parchment hover:border-gold/50 transition-colors"
+              href="/admin/winners"
+              className="rounded-full border border-gold/40 bg-gold-deep/15 px-4 py-2 text-xs font-semibold text-gold-light hover:bg-gold-deep/30 transition-colors shadow-sm"
             >
-              Voter Logs
+              🏆 Winners View
+            </Link>
+            <Link
+              href="/admin/voters"
+              className="rounded-full border border-white/15 bg-char px-4 py-2 text-xs font-semibold text-parchment hover:border-gold/50 transition-colors"
+            >
+              📜 Voter Logs
             </Link>
             <a
               href="/admin"
-              className="rounded-full border border-white/15 bg-char px-5 py-2 text-xs font-semibold text-muted hover:text-parchment hover:border-white/30 transition-colors"
+              className="rounded-full border border-white/15 bg-char px-4 py-2 text-xs font-semibold text-muted hover:text-parchment hover:border-white/30 transition-colors"
             >
-              Refresh
+              🔄 Refresh
             </a>
             <form action={handleLogout}>
               <button
                 type="submit"
-                className="rounded-full border border-white/15 bg-char px-5 py-2 text-xs font-semibold text-muted hover:text-parchment hover:border-white/30 transition-colors"
+                className="rounded-full border border-white/15 bg-char px-4 py-2 text-xs font-semibold text-muted hover:text-parchment hover:border-white/30 transition-colors"
               >
                 Logout
               </button>
@@ -352,51 +358,62 @@ export default async function AdminPage({
                   </span>
                 </div>
 
-                <div className="space-y-4">
+                <div className="space-y-5">
                   {cat.nominees.map((nominee, idx) => {
                     const isLeader = hasVotes && nominee.votes === leadingVotes && nominee.votes > 0;
+                    const initial = nominee.name.trim().charAt(0).toUpperCase() || "?";
 
                     return (
-                      <div key={nominee.id} className="group flex flex-col gap-1.5">
-                        <div className="flex items-start sm:items-center justify-between text-sm gap-2">
-                          <div className="flex items-start sm:items-center gap-2.5 min-w-0">
-                            <span className="font-mono text-xs text-muted font-semibold mt-0.5 sm:mt-0">
+                      <div key={nominee.id} className="group flex flex-col gap-2 rounded-lg bg-ink/30 p-3 sm:p-4 border border-white/5 hover:border-gold-deep/30 transition-all">
+                        <div className="flex items-center justify-between text-sm gap-3">
+                          <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+                            <span className="font-mono text-sm sm:text-base text-gold font-bold shrink-0 w-6 text-center">
                               {idx + 1}.
                             </span>
-                            {nominee.imageUrl && (
-                              <img
-                                src={nominee.imageUrl}
-                                alt={nominee.name}
-                                className="h-6 w-6 rounded-full object-cover border border-white/10 shrink-0 mt-0.5 sm:mt-0"
-                              />
-                            )}
+
+                            {/* Large Nominee Photo */}
+                            <div className="relative w-20 h-24 sm:w-24 sm:h-28 shrink-0 rounded-xl border-2 border-gold-deep/50 bg-ink overflow-hidden shadow-md group-hover:border-gold transition-colors">
+                              {nominee.imageUrl ? (
+                                <img
+                                  src={nominee.imageUrl}
+                                  alt={nominee.name}
+                                  className="h-full w-full object-cover object-top transition-transform duration-300 group-hover:scale-105"
+                                />
+                              ) : (
+                                <div className="flex h-full w-full items-center justify-center font-display text-xl font-bold text-gold-light">
+                                  {initial}
+                                </div>
+                              )}
+                            </div>
+
                             <div className="min-w-0">
-                              <div className="flex flex-wrap items-center gap-1.5">
-                                <span className="font-semibold text-parchment truncate">
+                              <div className="flex flex-wrap items-center gap-2">
+                                <span className="font-semibold text-base sm:text-lg text-parchment truncate">
                                   {nominee.name}
                                 </span>
                                 {isLeader && (
-                                  <span className="rounded-full bg-gold-deep/20 border border-gold-deep/60 px-2 py-0.5 text-[9px] font-bold text-gold-light uppercase tracking-wider shrink-0">
+                                  <span className="rounded-full bg-gold-deep/20 border border-gold-deep/60 px-2.5 py-0.5 text-[10px] font-bold text-gold-light uppercase tracking-wider shrink-0 shadow-sm">
                                     Leader 🏆
                                   </span>
                                 )}
                               </div>
                               {nominee.subtitle && (
-                                <span className="block text-[11px] text-muted truncate mt-0.5">
+                                <span className="block text-xs sm:text-sm text-muted truncate mt-0.5">
                                   ({nominee.subtitle})
                                 </span>
                               )}
                             </div>
                           </div>
-                          <div className="flex items-center gap-3 font-mono text-xs shrink-0 text-right mt-0.5 sm:mt-0">
-                            <span className="text-muted">{nominee.votes} votes</span>
-                            <span className="text-gold-light font-bold">
+
+                          <div className="flex flex-col items-end font-mono text-xs sm:text-sm shrink-0 text-right">
+                            <span className="text-gold-light font-bold text-sm sm:text-base">
                               {nominee.percentage}%
                             </span>
+                            <span className="text-muted text-xs">{nominee.votes} votes</span>
                           </div>
                         </div>
 
-                        <div className="h-2 w-full rounded-full bg-ink/65 overflow-hidden border border-white/5">
+                        <div className="h-2.5 w-full rounded-full bg-ink/80 overflow-hidden border border-white/10 mt-1">
                           <div
                             className={`h-full rounded-full transition-all duration-500 ${
                               isLeader
