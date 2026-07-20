@@ -395,13 +395,13 @@ function IdentityStep({
         Verify it&apos;s <span className="text-gold-gradient">really you</span>
       </h1>
       <p className="mt-2 text-center text-sm text-muted">
-        Each mobile number or email can vote once. No proxy votes, no do-overs.
+        Each mobile number can vote once. No proxy votes, no do-overs.
       </p>
 
       {alreadyVotedLocally && (
         <div className="mt-5 rounded-lg border border-maroon-light/50 bg-maroon/10 px-4 py-3 text-sm text-parchment/90">
           It looks like a vote was already submitted from this device. You can still try a different
-          number or email, but our server is the final check.
+          number, but our server is the final check.
         </div>
       )}
 
@@ -417,30 +417,15 @@ function IdentityStep({
           className="mt-2 mb-5 w-full rounded-lg border border-white/15 bg-ink/70 px-4 py-3 text-parchment placeholder:text-muted/60 outline-none focus:border-gold"
         />
 
-        <div className="flex rounded-lg border border-white/10 p-1 bg-ink/60">
-          {(["mobile", "email"] as ContactType[]).map((t) => (
-            <button
-              type="button"
-              key={t}
-              onClick={() => setContactType(t)}
-              className={[
-                "flex-1 rounded-md py-2 text-sm font-semibold transition-colors",
-                contactType === t ? "bg-gold-gradient text-ink" : "text-muted hover:text-parchment",
-              ].join(" ")}
-            >
-              {t === "mobile" ? "Mobile Number" : "Email Address"}
-            </button>
-          ))}
-        </div>
-
-        <label className="mt-5 block text-xs uppercase tracking-wide text-muted font-mono">
-          {contactType === "mobile" ? "10-digit mobile number" : "Email address"}
+        <label className="block text-xs uppercase tracking-wide text-muted font-mono">
+          10-digit mobile number
         </label>
         <input
           value={contact}
           onChange={(e) => setContact(e.target.value)}
-          placeholder={contactType === "mobile" ? "98765 43210" : "you@example.com"}
-          inputMode={contactType === "mobile" ? "numeric" : "email"}
+          placeholder="98765 43210"
+          inputMode="numeric"
+          required
           className="mt-2 w-full rounded-lg border border-white/15 bg-ink/70 px-4 py-3 text-parchment placeholder:text-muted/60 outline-none focus:border-gold"
         />
         {error && <p className="mt-2 text-sm text-maroon-light">{error}</p>}
@@ -553,8 +538,7 @@ function ReviewStep({
         Confirm your <span className="text-gold-gradient">final picks</span>
       </h1>
       <p className="mt-2 text-center text-sm text-muted">
-        Voting as {contactType === "mobile" ? "mobile" : "email"}{" "}
-        <span className="text-parchment/80">{contact}</span>. This cannot be changed after submitting.
+        Voting as mobile <span className="text-parchment/80">{contact}</span>. This cannot be changed after submitting.
       </p>
 
       <div className="mt-6 rounded-xl border border-gold-deep/30 bg-char divide-y divide-white/5">
