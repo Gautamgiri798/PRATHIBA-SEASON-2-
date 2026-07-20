@@ -293,3 +293,18 @@ export async function getVotersList(): Promise<{ name: string; contact: string; 
   }
 }
 
+export async function clearAllVotes(): Promise<void> {
+  try {
+    await initDb();
+    if (activeDriver === "postgres") {
+      await pool.query("DELETE FROM votes; DELETE FROM voters;");
+    } else {
+      const sqlite = getSqliteDb();
+      sqlite.exec("DELETE FROM votes; DELETE FROM voters;");
+    }
+  } catch (e) {
+    console.error("Failed to clear votes database:", e);
+    throw e;
+  }
+}
+

@@ -1,5 +1,6 @@
-import { getSetting, setSetting, getTotalVoters, getTallies } from "@/lib/db";
+import { getSetting, setSetting, getTotalVoters, getTallies, clearAllVotes } from "@/lib/db";
 import { CATEGORIES } from "@/lib/categories";
+import { ResetDatabaseButton } from "@/components/ResetDatabaseButton";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import Link from "next/link";
@@ -70,6 +71,13 @@ export default async function AdminPage({
         await setSetting("voting_ends_at", "");
       }
     }
+    redirect("/admin");
+  }
+
+  // Server Action to clear all votes and reset database
+  async function resetDatabase() {
+    "use server";
+    await clearAllVotes();
     redirect("/admin");
   }
 
@@ -330,6 +338,19 @@ export default async function AdminPage({
                 </div>
               </form>
             </div>
+          </div>
+
+          {/* Danger Zone / Reset Database Panel */}
+          <div className="mt-6 border-t border-white/10 pt-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div>
+              <p className="font-mono text-xs font-bold text-maroon-light uppercase tracking-wider">
+                ⚠️ Reset Database
+              </p>
+              <p className="text-xs text-muted mt-0.5">
+                Permanently delete all votes & voter logs to restart the election from zero.
+              </p>
+            </div>
+            <ResetDatabaseButton action={resetDatabase} />
           </div>
         </div>
 
