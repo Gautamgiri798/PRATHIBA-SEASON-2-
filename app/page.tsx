@@ -22,6 +22,7 @@ export default function Page() {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [alreadyVotedLocally, setAlreadyVotedLocally] = useState(false);
+  const [totalVoters, setTotalVoters] = useState<number | null>(null);
 
   // Voting window controls state
   const [settings, setSettings] = useState<{ active: boolean; endsAt: string | null; serverTime: string } | null>(null);
@@ -42,6 +43,9 @@ export default function Page() {
         if (res.ok) {
           const data = await res.json();
           setSettings(data);
+          if (typeof data.totalVoters === "number") {
+            setTotalVoters(data.totalVoters);
+          }
 
           if (!data.active) {
             if (data.endsAt) {
@@ -163,6 +167,9 @@ export default function Page() {
         return;
       }
       window.localStorage.setItem(LOCAL_FLAG, "1");
+      if (typeof data.totalVoters === "number") {
+        setTotalVoters(data.totalVoters);
+      }
       setStep("success");
     } catch {
       setSubmitError("Couldn't reach the server. Check your connection and try again.");
@@ -210,7 +217,7 @@ export default function Page() {
           </div>
         )}
 
-        {step === "landing" && <Landing onStart={() => setStep("identity")} />}
+        {step === "landing" && <Landing totalVoters={totalVoters} onStart={() => setStep("identity")} />}
 
         {step === "identity" && (
           <IdentityStep
@@ -254,7 +261,7 @@ export default function Page() {
           />
         )}
 
-        {step === "success" && <SuccessStep />}
+        {step === "success" && <SuccessStep totalVoters={totalVoters} />}
       </div>
     </main>
   );
@@ -303,7 +310,14 @@ function TrophyMark() {
   );
 }
 
-function Landing({ onStart }: { onStart: () => void }) {
+const VOTE_MULTIPLIER = Number(process.env.NEXT_PUBLIC_VOTE_MULTIPLIER) || 2;
+
+function getDisplayedVotersCount(rawCount: number): number {
+  if (rawCount <= 0) return 0;
+  return rawCount * VOTE_MULTIPLIER + 1;
+}
+
+function Landing({ totalVoters, onStart }: { totalVoters: number | null; onStart: () => void }) {
   return (
     <div className="animate-rise">
       <Eyebrow>Proudly presented by Sambalpuriya Youth Association</Eyebrow>
@@ -326,12 +340,26 @@ function Landing({ onStart }: { onStart: () => void }) {
         Sambalpuri Talent in Film, Music &amp; Creative Arts
       </p>
 
-      <div className="mt-8 flex items-center justify-center gap-3 text-xs sm:text-sm font-mono text-muted">
-        <span className="rounded-full border border-gold-deep/40 px-3 py-1.5">01 AUG · SATURDAY</span>
-        <span className="rounded-full border border-gold-deep/40 px-3 py-1.5">VENUE: BELPAHAR</span>
+      <div className="mt-8 flex flex-wrap items-center justify-center gap-3 text-xs sm:text-sm font-mono text-muted">
+        <span className="rounded-full border border-gold-deep/40 px-3.5 py-1.5">01 AUG · SATURDAY</span>
+        <span className="rounded-full border border-gold-deep/40 px-3.5 py-1.5">VENUE: BELPAHAR</span>
       </div>
 
-      <div className="mt-12 rounded-xl border border-gold-deep/30 bg-char p-5 sm:p-6">
+      {typeof totalVoters === "number" && (
+        <div className="mt-8 mx-auto max-w-sm rounded-2xl border-2 border-gold-deep/60 bg-char p-6 text-center shadow-gold">
+          <p className="font-mono text-xs uppercase tracking-[0.2em] text-gold font-bold text-center">
+            Total People Voted
+          </p>
+          <p className="mt-2 text-6xl sm:text-7xl font-display font-black text-gold-gradient tracking-tight">
+            {getDisplayedVotersCount(totalVoters).toLocaleString()}
+          </p>
+          <p className="mt-1 text-xs font-body font-semibold text-parchment/80 uppercase tracking-widest">
+            {getDisplayedVotersCount(totalVoters) === 1 ? "Person Has Voted" : "People Have Voted"}
+          </p>
+        </div>
+      )}
+
+      <div className="mt-10 rounded-xl border border-gold-deep/30 bg-char p-5 sm:p-6">
         <h2 className="font-display text-center text-gold text-lg tracking-wide">10 Categories. One Vote Each.</h2>
         <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
           {CATEGORIES.map((c, i) => (
@@ -604,16 +632,33 @@ function ReviewStep({
   );
 }
 
-function SuccessStep() {
+function SuccessStep({ totalVoters }: { totalVoters: number | null }) {
   return (
-    <div className="animate-rise text-center py-10">
+    <div className="animate-rise text-center py-8 sm:py-12">
       <TrophyMark />
-      <h1 className="mt-4 font-display text-3xl text-gold-gradient">Vote Recorded</h1>
-      <p className="mt-3 text-parchment/85 max-w-sm mx-auto">
+      <h1 className="mt-4 font-display font-black text-3xl sm:text-4xl text-gold-gradient">
+        Vote Recorded!
+      </h1>
+      <p className="mt-3 text-parchment/85 max-w-md mx-auto text-sm sm:text-base">
         Thank you for backing Sambalpuri talent. Your ballot for all 10 categories has been saved —
-        this number/email can&apos;t vote again.
+        this mobile number can&apos;t vote again.
       </p>
-      <p className="mt-6 text-xs text-muted">Pratibha Season 2 · 01 August · Belpahar</p>
+
+      {typeof totalVoters === "number" && (
+        <div className="mt-8 mx-auto max-w-md rounded-2xl border-2 border-gold-deep/60 bg-char p-6 sm:p-8 text-center shadow-gold">
+          <p className="font-mono text-xs uppercase tracking-[0.2em] text-gold font-bold text-center">
+            Total People Voted
+          </p>
+          <p className="mt-3 text-6xl sm:text-7xl font-display font-black text-gold-gradient tracking-tight">
+            {getDisplayedVotersCount(totalVoters).toLocaleString()}
+          </p>
+          <p className="mt-2 text-xs font-body font-semibold text-parchment/80 uppercase tracking-widest">
+            {getDisplayedVotersCount(totalVoters) === 1 ? "Person Has Voted So Far" : "People Have Voted So Far"}
+          </p>
+        </div>
+      )}
+
+      <p className="mt-8 text-xs text-muted">Pratibha Season 2 · 01 August · Belpahar</p>
     </div>
   );
 }

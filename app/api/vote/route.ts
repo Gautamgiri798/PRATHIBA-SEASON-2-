@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { castVoteTransaction, getSetting } from "@/lib/db";
+import { castVoteTransaction, getSetting, getTotalVoters } from "@/lib/db";
 import { normalizeContact, ContactType } from "@/lib/validate";
 import { CATEGORIES } from "@/lib/categories";
 
@@ -92,7 +92,8 @@ export async function POST(req: NextRequest) {
 
   try {
     const voterId = await castVoteTransaction(name.trim(), normalized, contactType, votes);
-    return NextResponse.json({ ok: true, voterId });
+    const totalVoters = await getTotalVoters();
+    return NextResponse.json({ ok: true, voterId, totalVoters });
   } catch (error: any) {
     // Catch PostgreSQL duplicate voter contact constraint (code '23505') or SQLite constraint
     if (
