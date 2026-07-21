@@ -26,7 +26,7 @@ const plexMono = IBM_Plex_Mono({
 export const metadata: Metadata = {
   title: "Pratibha Season 2 — Vote Now",
   description:
-    "Cast your vote for Pratibha Season 2, an award show celebrating Sambalpuri talent in film, music & creative arts. Presented by Sambalpuriya Youth Association.",
+    "Cast your vote for Pratibha Season 2, a tribute to the spirit, talent & tradition of Western Odisha. Presented by Sambalpuriya Youth Association.",
 };
 
 export default function RootLayout({

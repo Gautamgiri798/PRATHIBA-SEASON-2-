@@ -277,36 +277,13 @@ function Eyebrow({ children }: { children: React.ReactNode }) {
 
 function TrophyMark() {
   return (
-    <svg viewBox="0 0 120 140" className="h-24 w-24 sm:h-28 sm:w-28 mx-auto drop-shadow-[0_0_18px_rgba(201,151,61,0.35)]">
-      <defs>
-        <linearGradient id="goldStroke" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stopColor="#F4D77B" />
-          <stop offset="50%" stopColor="#C9973D" />
-          <stop offset="100%" stopColor="#8B6914" />
-        </linearGradient>
-      </defs>
-      {/* star */}
-      <path
-        d="M60 4 L65 18 L80 18 L68 27 L72 42 L60 33 L48 42 L52 27 L40 18 L55 18 Z"
-        fill="url(#goldStroke)"
-        className="animate-flicker"
+    <div className="relative mx-auto w-24 sm:w-32 my-1 flex items-center justify-center">
+      <img
+        src="/trophy.png"
+        alt="Pratibha Awards Trophy"
+        className="w-full h-auto max-h-44 sm:max-h-52 object-contain drop-shadow-[0_2px_15px_rgba(201,151,61,0.4)] transition-transform duration-300 hover:scale-105"
       />
-      {/* ring */}
-      <circle cx="60" cy="72" r="34" fill="none" stroke="url(#goldStroke)" strokeWidth="3" />
-      {/* figure: head */}
-      <circle cx="60" cy="52" r="9" fill="url(#goldStroke)" />
-      {/* figure: body / arms raised */}
-      <path
-        d="M60 62 L60 88 M60 68 L44 50 M60 68 L76 50 M60 88 L48 108 M60 88 L72 108"
-        stroke="url(#goldStroke)"
-        strokeWidth="5"
-        strokeLinecap="round"
-        fill="none"
-      />
-      {/* base */}
-      <rect x="42" y="112" width="36" height="6" rx="2" fill="url(#goldStroke)" />
-      <rect x="48" y="120" width="24" height="8" rx="2" fill="url(#goldStroke)" />
-    </svg>
+    </div>
   );
 }
 
@@ -329,16 +306,38 @@ function Landing({ totalVoters, onStart }: { totalVoters: number | null; onStart
       <h1 className="mt-4 text-center font-display font-black text-5xl sm:text-7xl tracking-wide text-gold-gradient leading-none">
         PRATIBHA
       </h1>
-      <p className="mt-2 text-center font-display text-lg sm:text-2xl tracking-[0.35em] text-parchment/90">
-        SEASON 2
-      </p>
+      {/* Season 2 line with decorative diamonds */}
+      <div className="flex items-center justify-center gap-3 mt-3 mb-5">
+        <div className="h-[1px] w-12 sm:w-20 bg-gradient-to-r from-transparent to-gold/70 relative flex items-center justify-end">
+          <span className="w-1.5 h-1.5 rotate-45 bg-gold translate-x-0.5" />
+        </div>
+        <p className="font-display text-sm sm:text-lg tracking-[0.4em] text-parchment font-semibold pl-1">
+          SEASON 2
+        </p>
+        <div className="h-[1px] w-12 sm:w-20 bg-gradient-to-l from-transparent to-gold/70 relative flex items-center justify-start">
+          <span className="w-1.5 h-1.5 rotate-45 bg-gold -translate-x-0.5" />
+        </div>
+      </div>
 
-      <p className="mt-6 text-center font-body text-sm sm:text-base text-muted italic">
-        An award show celebrating
-      </p>
-      <p className="text-center font-display text-base sm:text-lg text-parchment tracking-wide">
-        Sambalpuri Talent in Film, Music &amp; Creative Arts
-      </p>
+      {/* Tribute Quote styled exactly like reference banner */}
+      <div className="mt-5 text-center font-display tracking-[0.22em] leading-relaxed text-xs sm:text-sm">
+        <p className="text-parchment/90">A TRIBUTE TO SPIRIT, TALENT</p>
+        <p className="text-parchment/90 mt-1">AND TRADITION OF</p>
+        <p className="text-gold-gradient font-black text-base sm:text-xl tracking-[0.28em] mt-1.5">
+          WESTERN ODISHA
+        </p>
+      </div>
+
+      {/* Decorative filigree ornament line */}
+      <div className="flex items-center justify-center gap-3 my-5">
+        <div className="h-[1px] w-16 sm:w-28 bg-gradient-to-r from-transparent via-gold/40 to-gold/80" />
+        <svg width="24" height="12" viewBox="0 0 24 12" fill="none" className="text-gold drop-shadow-[0_0_6px_rgba(201,151,61,0.5)]">
+          <path d="M12 0L15 6L12 12L9 6L12 0Z" fill="currentColor" />
+          <circle cx="4" cy="6" r="1.5" fill="currentColor" />
+          <circle cx="20" cy="6" r="1.5" fill="currentColor" />
+        </svg>
+        <div className="h-[1px] w-16 sm:w-28 bg-gradient-to-l from-transparent via-gold/40 to-gold/80" />
+      </div>
 
       <div className="mt-8 flex flex-wrap items-center justify-center gap-3 text-xs sm:text-sm font-mono text-muted">
         <span className="rounded-full border border-gold-deep/40 px-3.5 py-1.5">01 AUG · SATURDAY</span>
@@ -360,7 +359,7 @@ function Landing({ totalVoters, onStart }: { totalVoters: number | null; onStart
       )}
 
       <div className="mt-10 rounded-xl border border-gold-deep/30 bg-char p-5 sm:p-6">
-        <h2 className="font-display text-center text-gold text-lg tracking-wide">10 Categories. One Vote Each.</h2>
+        <h2 className="font-display text-center text-gold text-lg tracking-wide uppercase">Categories.</h2>
         <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
           {CATEGORIES.map((c, i) => (
             <div key={c.id} className="flex items-start gap-2 text-parchment/80">
@@ -379,7 +378,7 @@ function Landing({ totalVoters, onStart }: { totalVoters: number | null; onStart
           Cast Your Vote
         </button>
         <p className="mt-3 text-xs text-muted">
-          One vote per mobile number or email. Takes about 2 minutes.
+          One vote per mobile number. Takes about 2 minutes.
         </p>
       </div>
 
@@ -645,7 +644,7 @@ function SuccessStep({ totalVoters }: { totalVoters: number | null }) {
         Vote Recorded!
       </h1>
       <p className="mt-3 text-parchment/85 max-w-md mx-auto text-sm sm:text-base">
-        Thank you for backing Sambalpuri talent. Your ballot for all 10 categories has been saved —
+        Thank you for backing Sambalpuri talent. Your ballot for all categories has been saved —
         this mobile number can&apos;t vote again.
       </p>
 
