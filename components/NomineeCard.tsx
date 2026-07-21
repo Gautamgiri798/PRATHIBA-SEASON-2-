@@ -46,16 +46,22 @@ export function NomineeCard({
         )}
       </div>
 
-      <span className="flex-1 min-w-0">
+      <span className="flex-1 min-w-0 space-y-1">
         <span
           className={[
-            "block font-body font-semibold truncate",
+            "block font-body text-base sm:text-lg font-bold truncate",
             selected ? "text-parchment" : "text-parchment/90",
           ].join(" ")}
         >
           {nominee.name}
         </span>
-        {nominee.subtitle && (
+        {nominee.song && (
+          <span className="flex items-center gap-1.5 text-xs sm:text-sm text-gold font-medium truncate mt-0.5">
+            <span>🎵</span>
+            <span>Song: <strong className="font-semibold text-gold-light">{nominee.song}</strong></span>
+          </span>
+        )}
+        {!nominee.song && nominee.subtitle && (
           <span className="block text-xs text-muted mt-0.5 truncate">{nominee.subtitle}</span>
         )}
       </span>

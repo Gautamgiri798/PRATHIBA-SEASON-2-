@@ -418,7 +418,12 @@ export default async function AdminPage({
                                   </span>
                                 )}
                               </div>
-                              {nominee.subtitle && (
+                              {nominee.song && (
+                                <span className="block text-xs sm:text-sm font-medium text-gold-light truncate mt-0.5">
+                                  🎵 Song: {nominee.song}
+                                </span>
+                              )}
+                              {!nominee.song && nominee.subtitle && (
                                 <span className="block text-xs sm:text-sm text-muted truncate mt-0.5">
                                   ({nominee.subtitle})
                                 </span>

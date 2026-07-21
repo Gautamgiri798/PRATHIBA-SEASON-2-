@@ -241,7 +241,12 @@ export default async function AdminWinnersPage() {
                             <h3 className="mt-1.5 font-display text-xl sm:text-2xl font-bold text-parchment leading-tight">
                               {winner.name}
                             </h3>
-                            {winner.subtitle && (
+                            {winner.song && (
+                              <p className="text-xs font-semibold text-gold-light truncate mt-0.5">
+                                🎵 Song: {winner.song}
+                              </p>
+                            )}
+                            {!winner.song && winner.subtitle && (
                               <p className="text-xs text-muted truncate mt-0.5">
                                 {winner.subtitle}
                               </p>

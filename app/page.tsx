@@ -588,6 +588,11 @@ function ReviewStep({
                   <p className="mt-0.5 font-body font-semibold text-parchment truncate">
                     {nominee ? nominee.name : <span className="text-maroon-light">Not voted</span>}
                   </p>
+                  {nominee?.song && (
+                    <p className="text-xs text-gold-light/90 font-medium truncate">
+                      🎵 Song: {nominee.song}
+                    </p>
+                  )}
                 </div>
               </div>
               <button
