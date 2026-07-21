@@ -21,7 +21,7 @@ export const CATEGORIES: Category[] = [
     title: "Best Actor (Music Album)",
     group: "Music Awards",
     description: "Lead performance in a Sambalpuri music album.",
-    thumbnailUrl: "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?auto=format&fit=crop&w=120&h=160&q=70",
+    thumbnailUrl: "/nominees/All Category/Best Actor.jpeg",
     nominees: [
       {
         id: "n1",
@@ -60,7 +60,7 @@ export const CATEGORIES: Category[] = [
     title: "Best Actress (Music Album)",
     group: "Music Awards",
     description: "Lead performance in a Sambalpuri music album.",
-    thumbnailUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&h=160&q=70",
+    thumbnailUrl: "/nominees/All Category/Best Actress.jpeg",
     nominees: [
       {
         id: "n1",
@@ -99,7 +99,7 @@ export const CATEGORIES: Category[] = [
     title: "Best Singer — Male",
     group: "Music Awards",
     description: "Outstanding male vocal performance.",
-    thumbnailUrl: "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&w=120&h=160&q=70",
+    thumbnailUrl: "/nominees/All Category/Best Singer Male.jpeg",
     nominees: [
       {
         id: "n1",
@@ -138,7 +138,7 @@ export const CATEGORIES: Category[] = [
     title: "Best Singer — Female",
     group: "Music Awards",
     description: "Outstanding female vocal performance.",
-    thumbnailUrl: "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?auto=format&fit=crop&w=120&h=160&q=70",
+    thumbnailUrl: "/nominees/All Category/Best Singer Female.jpeg",
     nominees: [
       {
         id: "n1",
@@ -171,7 +171,7 @@ export const CATEGORIES: Category[] = [
     title: "Best Director",
     group: "Film Production Awards",
     description: "Vision and command behind the camera.",
-    thumbnailUrl: "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&w=120&h=160&q=70",
+    thumbnailUrl: "/nominees/All Category/Best Director.jpeg",
     nominees: [
       {
         id: "n1",
@@ -210,7 +210,7 @@ export const CATEGORIES: Category[] = [
     title: "Best Choreographer",
     group: "Film Production Awards",
     description: "Vision and creativity behind every performance.",
-    thumbnailUrl: "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?auto=format&fit=crop&w=120&h=160&q=70",
+    thumbnailUrl: "/nominees/All Category/Best Choreographer.jpeg",
     nominees: [
       {
         id: "n1",
@@ -249,7 +249,7 @@ export const CATEGORIES: Category[] = [
     title: "Best DOP",
     group: "Film Production Awards",
     description: "Director of Photography — the eye behind the frame.",
-    thumbnailUrl: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=120&h=160&q=70",
+    thumbnailUrl: "/nominees/All Category/Best DOP.jpeg",
     nominees: [
       {
         id: "n1",
@@ -288,7 +288,7 @@ export const CATEGORIES: Category[] = [
     title: "Best Music",
     group: "Film Production Awards",
     description: "The soul of every story, brought to life through music.",
-    thumbnailUrl: "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?auto=format&fit=crop&w=120&h=160&q=70",
+    thumbnailUrl: "/nominees/All Category/Best Music.jpeg",
     nominees: [
       {
         id: "n1",
@@ -328,7 +328,7 @@ export const CATEGORIES: Category[] = [
     title: "Best Actor/Actress In Comedy",
     group: "Film Production Awards",
     description: "Bringing laughter to life with unforgettable performances.",
-    thumbnailUrl: "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?auto=format&fit=crop&w=120&h=160&q=70",
+    thumbnailUrl: "/nominees/All Category/Best Comedy.jpeg",
     nominees: [
       {
         id: "n1",

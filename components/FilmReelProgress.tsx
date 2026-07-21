@@ -40,12 +40,12 @@ export function FilmReelProgress({
                 title={cat.title}
                 aria-current={active ? "step" : undefined}
                 className={[
-                  "group relative aspect-[3/4] rounded-[3px] border transition-all duration-200 flex flex-col items-center justify-center overflow-hidden w-full",
+                  "group relative aspect-[3/4] rounded-[4px] border transition-all duration-200 flex flex-col items-center justify-center overflow-hidden w-full",
                   active
-                    ? "border-gold shadow-gold"
+                    ? "border-gold shadow-gold ring-2 ring-gold/40 scale-[1.03] z-10"
                     : voted
-                    ? "border-gold-deep/70"
-                    : "border-white/10 hover:border-white/25",
+                    ? "border-gold-deep/80 hover:border-gold"
+                    : "border-white/20 hover:border-gold-deep/50",
                 ].join(" ")}
               >
                 {/* Category Film Reel Thumbnail Photo */}
@@ -56,24 +56,28 @@ export function FilmReelProgress({
                     className={[
                       "absolute inset-0 w-full h-full object-cover transition-all duration-300",
                       active
-                        ? "opacity-60 scale-105"
+                        ? "opacity-100 scale-105"
                         : voted
-                        ? "opacity-35 mix-blend-luminosity group-hover:opacity-45"
-                        : "opacity-15 mix-blend-luminosity group-hover:opacity-25",
+                        ? "opacity-90 group-hover:opacity-100 group-hover:scale-105"
+                        : "opacity-80 group-hover:opacity-100 group-hover:scale-105",
                     ].join(" ")}
                   />
                 ) : (
                   <div className="absolute inset-0 bg-ink/65" />
                 )}
 
-                {/* Dark shading overlay to guarantee text legibility */}
-                <div className="absolute inset-0 bg-black/40 group-hover:bg-black/25 transition-colors pointer-events-none" />
+                {/* Subtle gradient overlay for text contrast without dimming poster image */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-black/30 group-hover:from-black/50 transition-colors pointer-events-none" />
 
-                {/* Step Number */}
+                {/* Step Number Badge */}
                 <span
                   className={[
-                    "relative z-10 font-mono text-[10px] sm:text-xs tracking-wide font-bold drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]",
-                    active ? "text-gold-light" : voted ? "text-gold" : "text-muted group-hover:text-parchment",
+                    "relative z-10 font-mono text-[11px] sm:text-xs tracking-wider font-extrabold px-1.5 py-0.5 rounded bg-ink/75 backdrop-blur-sm border shadow-md",
+                    active
+                      ? "text-gold-light border-gold shadow-gold/50"
+                      : voted
+                      ? "text-gold border-gold-deep/60"
+                      : "text-parchment/90 border-white/20 group-hover:text-parchment group-hover:border-white/40",
                   ].join(" ")}
                 >
                   {String(i + 1).padStart(2, "0")}
@@ -81,7 +85,7 @@ export function FilmReelProgress({
 
                 {/* Custom Voted Indicator Badge */}
                 {voted && (
-                  <span className="absolute z-10 top-1 right-1 h-1.5 w-1.5 rounded-full bg-gold shadow-[0_0_4px_rgba(201,151,61,0.8)]" />
+                  <span className="absolute z-10 top-1 right-1 h-2 w-2 rounded-full bg-gold border border-ink shadow-[0_0_6px_rgba(201,151,61,1)]" />
                 )}
               </button>
             );
