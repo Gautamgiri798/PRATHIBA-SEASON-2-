@@ -9,9 +9,11 @@ import Link from "next/link";
 
 type Step = "landing" | "identity" | "category" | "review" | "success";
 
-const LOCAL_FLAG = "pratibha_s2_voted";
-
-export default function Page() {
+export function TestVoteWizard({
+  logoutAction,
+}: {
+  logoutAction: () => Promise<void>;
+}) {
   const [step, setStep] = useState<Step>("landing");
   const [categoryIndex, setCategoryIndex] = useState(0);
   const [contactType, setContactType] = useState<ContactType>("mobile");
@@ -21,82 +23,20 @@ export default function Page() {
   const [votes, setVotes] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
-  const [alreadyVotedLocally, setAlreadyVotedLocally] = useState(false);
   const [totalVoters, setTotalVoters] = useState<number | null>(null);
-
-  // Voting window controls state
-  const [settings, setSettings] = useState<{ active: boolean; endsAt: string | null; serverTime: string } | null>(null);
-  const [timeRemaining, setTimeRemaining] = useState<string | null>(null);
-  const [isClosed, setIsClosed] = useState(false);
-  const [isNotStarted, setIsNotStarted] = useState(false);
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      setAlreadyVotedLocally(window.localStorage.getItem(LOCAL_FLAG) === "1");
-    }
-  }, []);
 
   useEffect(() => {
     async function fetchSettings() {
       try {
-        const res = await fetch("/api/settings");
+        const res = await fetch("/api/admin/settings?test=true");
         if (res.ok) {
           const data = await res.json();
-          setSettings(data);
           if (typeof data.totalVoters === "number") {
             setTotalVoters(data.totalVoters);
           }
-
-          if (!data.active) {
-            if (data.endsAt) {
-              setIsClosed(true);
-            } else {
-              setIsNotStarted(true);
-            }
-            return;
-          }
-
-          if (data.endsAt) {
-            const endsTime = new Date(data.endsAt).getTime();
-            const serverTime = new Date(data.serverTime).getTime();
-            const timeDiff = serverTime - Date.now(); // local offset
-
-            const updateTimer = () => {
-              const nowAdjusted = Date.now() + timeDiff;
-              const remaining = endsTime - nowAdjusted;
-
-              if (remaining <= 0) {
-                setTimeRemaining("00h 00m 00s");
-                setIsClosed(true);
-                return true; // stop timer
-              }
-
-              const days = Math.floor(remaining / (1000 * 60 * 60 * 24));
-              const hours = Math.floor((remaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-              const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
-              const seconds = Math.floor((remaining % (1000 * 60)) / 1000);
-
-              let timeStr = "";
-              if (days > 0) {
-                timeStr += `${String(days).padStart(2, "0")}d `;
-              }
-              timeStr += `${String(hours).padStart(2, "0")}h ${String(minutes).padStart(2, "0")}m ${String(seconds).padStart(2, "0")}s`;
-              setTimeRemaining(timeStr);
-              return false;
-            };
-
-            const stopped = updateTimer();
-            if (!stopped) {
-              const interval = setInterval(() => {
-                const s = updateTimer();
-                if (s) clearInterval(interval);
-              }, 1000);
-              return () => clearInterval(interval);
-            }
-          }
         }
       } catch (err) {
-        console.error("Failed to load settings:", err);
+        console.error("Failed to load test settings:", err);
       }
     }
     fetchSettings();
@@ -155,7 +95,7 @@ export default function Page() {
     setSubmitError(null);
     const normalized = normalizeContact(contact, contactType);
     try {
-      const res = await fetch("/api/vote", {
+      const res = await fetch("/api/admin/test-vote", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name: name.trim(), contact: normalized, contactType, votes }),
@@ -166,7 +106,6 @@ export default function Page() {
         setSubmitting(false);
         return;
       }
-      window.localStorage.setItem(LOCAL_FLAG, "1");
       if (typeof data.totalVoters === "number") {
         setTotalVoters(data.totalVoters);
       }
@@ -178,46 +117,61 @@ export default function Page() {
     }
   }
 
-  if (settings && (isClosed || isNotStarted)) {
-    return (
-      <main className="min-h-screen bg-ink relative flex items-center justify-center px-4">
-        <div className="pointer-events-none fixed inset-0 bg-radial-glow" />
-        <div className="relative w-full max-w-md rounded-xl border border-gold-deep/30 bg-char p-6 sm:p-8 text-center shadow-gold animate-rise">
-          <Eyebrow>Pratibha Season 2 Awards</Eyebrow>
-          <div className="mt-6">
-            <TrophyMark />
-          </div>
-          <h1 className="mt-4 font-display font-black text-3xl text-gold-gradient leading-none">
-            VOTING {isClosed ? "CLOSED" : "NOT STARTED"}
-          </h1>
-          <p className="mt-4 text-sm text-muted">
-            {isClosed 
-              ? "The voting phase has ended. Thank you for your participation!"
-              : "Voting hasn't started yet. Please check back later."}
-          </p>
-          <div className="mt-6 border-t border-white/5 pt-4">
-            <Link href="/admin" className="text-xs text-muted hover:text-gold underline">
-              Admin Portal
-            </Link>
-          </div>
-        </div>
-      </main>
-    );
-  }
-
   return (
     <main className="min-h-screen bg-ink relative">
       <div className="pointer-events-none fixed inset-0 bg-radial-glow" />
       <div className="relative mx-auto max-w-3xl px-4 sm:px-6 py-8 sm:py-14">
-        {/* Countdown Banner */}
-        {timeRemaining && (
-          <div className="mb-6 rounded-lg border border-gold/30 bg-gold-deep/10 px-4 py-2.5 text-center text-xs sm:text-sm font-mono text-gold-light animate-pulse shadow-sm flex items-center justify-center gap-2">
-            <span>⏳</span>
-            <span>Voting Ends In: <strong className="font-semibold">{timeRemaining}</strong></span>
+        
+        {/* Navigation Header */}
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-white/10 pb-6 mb-8">
+          <div>
+            <p className="font-mono text-xs tracking-widest text-gold-deep uppercase">
+              Sambalpuriya Youth Association
+            </p>
+            <h1 className="mt-1 font-display font-black text-3xl sm:text-4xl text-parchment tracking-wide">
+              TEST <span className="text-gold-gradient">VOTING</span>
+            </h1>
           </div>
-        )}
 
-        {step === "landing" && <Landing totalVoters={totalVoters} onStart={() => setStep("identity")} />}
+          <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2.5">
+            <Link
+              href="/admin"
+              className="rounded-full border border-white/15 bg-char px-4 py-2 text-xs font-semibold text-muted hover:text-parchment hover:border-white/30 transition-colors"
+            >
+              📊 Dashboard
+            </Link>
+            <Link
+              href="/admin/winners"
+              className="rounded-full border border-gold/40 bg-gold-deep/15 px-4 py-2 text-xs font-semibold text-gold-light hover:bg-gold-deep/30 transition-colors shadow-sm"
+            >
+              🏆 Winners View
+            </Link>
+            <Link
+              href="/admin/voters"
+              className="rounded-full border border-white/15 bg-char px-4 py-2 text-xs font-semibold text-muted hover:text-parchment hover:border-white/30 transition-colors"
+            >
+              📜 Voter Logs
+            </Link>
+            <form action={logoutAction}>
+              <button
+                type="submit"
+                className="rounded-full border border-white/15 bg-char px-4 py-2 text-xs font-semibold text-muted hover:text-parchment hover:border-white/30 transition-colors"
+              >
+                Logout
+              </button>
+            </form>
+          </div>
+        </div>
+
+        {/* Test Voting Mode Warning Banner */}
+        <div className="mb-6 rounded-lg border border-purple-500/30 bg-purple-950/10 px-4 py-2.5 text-center text-xs sm:text-sm font-mono text-purple-300 shadow-sm flex items-center justify-center gap-2">
+          <span>⚠️</span>
+          <span><strong>TEST VOTING MODE:</strong> Your selections will be recorded in the separate test database (`test_votes.db`) and will not affect live election results.</span>
+        </div>
+
+        {step === "landing" && (
+          <Landing totalVoters={totalVoters} onStart={() => setStep("identity")} />
+        )}
 
         {step === "identity" && (
           <IdentityStep
@@ -229,7 +183,6 @@ export default function Page() {
             setContact={setContact}
             error={identityError}
             onSubmit={handleIdentitySubmit}
-            alreadyVotedLocally={alreadyVotedLocally}
           />
         )}
 
@@ -321,26 +274,6 @@ function Landing({ totalVoters, onStart }: { totalVoters: number | null; onStart
         </div>
       </div>
 
-      {/* Tribute Quote styled exactly like reference banner */}
-      <div className="mt-5 text-center font-display tracking-[0.22em] leading-relaxed text-xs sm:text-sm">
-        <p className="text-parchment/90">A TRIBUTE TO SPIRIT, TALENT</p>
-        <p className="text-parchment/90 mt-1">AND TRADITION OF</p>
-        <p className="text-gold-gradient font-black text-base sm:text-xl tracking-[0.28em] mt-1.5">
-          WESTERN ODISHA
-        </p>
-      </div>
-
-      {/* Decorative filigree ornament line */}
-      <div className="flex items-center justify-center gap-3 my-5">
-        <div className="h-[1px] w-16 sm:w-28 bg-gradient-to-r from-transparent via-gold/40 to-gold/80" />
-        <svg width="24" height="12" viewBox="0 0 24 12" fill="none" className="text-gold drop-shadow-[0_0_6px_rgba(201,151,61,0.5)]">
-          <path d="M12 0L15 6L12 12L9 6L12 0Z" fill="currentColor" />
-          <circle cx="4" cy="6" r="1.5" fill="currentColor" />
-          <circle cx="20" cy="6" r="1.5" fill="currentColor" />
-        </svg>
-        <div className="h-[1px] w-16 sm:w-28 bg-gradient-to-l from-transparent via-gold/40 to-gold/80" />
-      </div>
-
       <div className="mt-8 flex flex-wrap items-center justify-center gap-3 text-xs sm:text-sm font-mono text-muted">
         <span className="rounded-full border border-gold-deep/40 px-3.5 py-1.5">01 AUG · SATURDAY</span>
         <span className="rounded-full border border-gold-deep/40 px-3.5 py-1.5">VENUE: BELPAHAR</span>
@@ -349,27 +282,22 @@ function Landing({ totalVoters, onStart }: { totalVoters: number | null; onStart
       {typeof totalVoters === "number" && (
         <div className="mt-8 mx-auto max-w-sm rounded-2xl border-2 border-gold-deep/60 bg-char p-6 text-center shadow-gold">
           <p className="font-mono text-xs uppercase tracking-[0.2em] text-gold font-bold text-center">
-            Total People Voted
+            Total Test Votes
           </p>
           <p className="mt-2 text-6xl sm:text-7xl font-display font-black text-gold-gradient tracking-tight">
             {getDisplayedVotersCount(totalVoters).toLocaleString()}
           </p>
           <p className="mt-1 text-xs font-body font-semibold text-parchment/80 uppercase tracking-widest">
-            {getDisplayedVotersCount(totalVoters) === 1 ? "Person Has Voted" : "People Have Voted"}
+            {getDisplayedVotersCount(totalVoters) === 1 ? "Simulated Person Has Voted" : "Simulated People Have Voted"}
           </p>
         </div>
       )}
 
-      <div className="mt-10 rounded-xl border border-gold-deep/30 bg-char p-5 sm:p-6">
-        <h2 className="font-display text-center text-gold text-lg tracking-wide uppercase">Categories.</h2>
-        <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
-          {CATEGORIES.map((c, i) => (
-            <div key={c.id} className="flex items-start gap-2 text-parchment/80">
-              <span className="font-mono text-xs text-gold-deep mt-0.5">{String(i + 1).padStart(2, "0")}</span>
-              <span>{c.title}</span>
-            </div>
-          ))}
-        </div>
+      <div className="mt-8 rounded-xl border border-gold-deep/30 bg-char p-5 sm:p-6 text-center">
+        <h2 className="font-display text-gold text-lg tracking-wide uppercase">Test Voting Simulator</h2>
+        <p className="mt-2 text-sm text-parchment/80">
+          This portal allows you to simulate casting a ballot for all categories. Your choices will be saved directly in the separate test database (`test_votes.db`), ensuring testing does not affect the actual live election.
+        </p>
       </div>
 
       <div className="mt-8 text-center">
@@ -377,20 +305,8 @@ function Landing({ totalVoters, onStart }: { totalVoters: number | null; onStart
           onClick={onStart}
           className="inline-flex items-center gap-2 rounded-full bg-gold-gradient px-8 py-3.5 font-body font-bold text-ink shadow-gold transition-transform hover:scale-[1.03] active:scale-[0.98]"
         >
-          Cast Your Vote
+          Begin Test Vote
         </button>
-        <p className="mt-3 text-xs text-muted">
-          One vote per mobile number. Takes about 2 minutes.
-        </p>
-      </div>
-
-      <div className="mt-12 text-center border-t border-white/5 pt-6">
-        <Link
-          href="/admin"
-          className="text-xs font-mono tracking-widest text-muted/50 hover:text-gold transition-colors uppercase"
-        >
-          Admin Portal
-        </Link>
       </div>
     </div>
   );
@@ -405,7 +321,6 @@ function IdentityStep({
   setContact,
   error,
   onSubmit,
-  alreadyVotedLocally,
 }: {
   name: string;
   setName: (v: string) => void;
@@ -415,7 +330,6 @@ function IdentityStep({
   setContact: (v: string) => void;
   error: string | null;
   onSubmit: (e: React.FormEvent) => void;
-  alreadyVotedLocally: boolean;
 }) {
   return (
     <div className="animate-rise mx-auto max-w-md">
@@ -424,19 +338,12 @@ function IdentityStep({
         Verify it&apos;s <span className="text-gold-gradient">really you</span>
       </h1>
       <p className="mt-2 text-center text-sm text-muted">
-        Each mobile number can vote once. No proxy votes, no do-overs.
+        Enter a test name and a valid 10-digit Indian mobile number.
       </p>
-
-      {alreadyVotedLocally && (
-        <div className="mt-5 rounded-lg border border-maroon-light/50 bg-maroon/10 px-4 py-3 text-sm text-parchment/90">
-          It looks like a vote was already submitted from this device. You can still try a different
-          number, but our server is the final check.
-        </div>
-      )}
 
       <form onSubmit={onSubmit} className="mt-6 rounded-xl border border-gold-deep/30 bg-char p-5 sm:p-6">
         <label className="block text-xs uppercase tracking-wide text-muted font-mono">
-          Full Name
+          Full Name (e.g. Test Voter 1)
         </label>
         <input
           value={name}
@@ -465,9 +372,6 @@ function IdentityStep({
         >
           Continue to Voting
         </button>
-        <p className="mt-3 text-center text-[11px] text-muted">
-          Your contact is only used to prevent duplicate voting. It won&apos;t be shown publicly.
-        </p>
       </form>
     </div>
   );
@@ -567,7 +471,7 @@ function ReviewStep({
         Confirm your <span className="text-gold-gradient">final picks</span>
       </h1>
       <p className="mt-2 text-center text-sm text-muted">
-        Voting as mobile <span className="text-parchment/80">{contact}</span>. This cannot be changed after submitting.
+        Testing as mobile <span className="text-parchment/80">{contact}</span>.
       </p>
 
       <div className="mt-6 rounded-xl border border-gold-deep/30 bg-char divide-y divide-white/5">
@@ -628,11 +532,8 @@ function ReviewStep({
           disabled={!allVoted || submitting}
           className="inline-flex items-center gap-2 rounded-full bg-gold-gradient px-10 py-3.5 font-bold text-ink shadow-gold disabled:opacity-40 disabled:shadow-none transition-transform enabled:hover:scale-[1.02]"
         >
-          {submitting ? "Submitting…" : "Submit My Vote"}
+          {submitting ? "Submitting…" : "Submit Test Vote"}
         </button>
-        <p className="mt-3 text-xs text-muted">
-          By submitting, you confirm this is your own genuine vote.
-        </p>
       </div>
     </div>
   );
@@ -680,7 +581,24 @@ function SuccessStep({
         </div>
       </div>
 
-      <p className="mt-8 text-xs text-muted">Pratibha Season 2 · 01 August · Belpahar</p>
+
+      {/* Admin Actions Section */}
+      <div className="mt-10 flex flex-col sm:flex-row justify-center gap-4 border-t border-white/10 pt-6">
+        <Link
+          href="/admin"
+          className="rounded-full bg-gold-gradient px-6 py-3 font-semibold text-ink shadow-gold transition-transform hover:scale-[1.02]"
+        >
+          📊 View Dashboard
+        </Link>
+        <Link
+          href="/admin/voters"
+          className="rounded-full border border-white/15 bg-char hover:border-gold-deep/50 hover:bg-charLight px-6 py-3 font-semibold text-parchment transition-colors"
+        >
+          📜 View Voter Logs
+        </Link>
+      </div>
+
+      <p className="mt-8 text-xs text-muted">Pratibha Season 2 · 01 August · Belpahar (Test Environment)</p>
     </div>
   );
 }

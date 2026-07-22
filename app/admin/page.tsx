@@ -16,7 +16,7 @@ type TallyRow = {
 export default async function AdminPage({
   searchParams,
 }: {
-  searchParams: { error?: string };
+  searchParams: { error?: string; mode?: string };
 }) {
   const cookieStore = cookies();
   const sessionToken = cookieStore.get("admin_session")?.value;
@@ -56,29 +56,30 @@ export default async function AdminPage({
   // Server Action to update voting controls settings in DB
   async function updateVotingSettings(formData: FormData) {
     "use server";
+    const isTestParam = formData.get("is_test")?.toString() === "true";
     const active = formData.get("active")?.toString();
     const endsAt = formData.get("ends_at")?.toString();
 
     if (active !== undefined) {
-      await setSetting("voting_active", active);
+      await setSetting("voting_active", active, isTestParam);
     }
     if (endsAt !== undefined) {
       if (endsAt) {
         // Convert datetime-local string (YYYY-MM-DDTHH:MM) to ISO string
         const isoDate = new Date(endsAt).toISOString();
-        await setSetting("voting_ends_at", isoDate);
+        await setSetting("voting_ends_at", isoDate, isTestParam);
       } else {
-        await setSetting("voting_ends_at", "");
+        await setSetting("voting_ends_at", "", isTestParam);
       }
     }
-    redirect("/admin");
+    redirect(isTestParam ? "/admin?mode=test" : "/admin");
   }
 
   // Server Action to clear all votes and reset database
-  async function resetDatabase() {
+  async function resetDatabase(isTestParam: boolean) {
     "use server";
-    await clearAllVotes();
-    redirect("/admin");
+    await clearAllVotes(isTestParam);
+    redirect(isTestParam ? "/admin?mode=test" : "/admin");
   }
 
   // Render Login Form if not authorized
@@ -131,9 +132,13 @@ export default async function AdminPage({
     );
   }
 
+  const isTest = searchParams.mode === "test";
+  const modeQuery = isTest ? "?mode=test" : "";
+  const boundResetDatabase = resetDatabase.bind(null, isTest);
+
   // Render Admin Dashboard if authorized
-  const votingActive = (await getSetting("voting_active")) === "true";
-  const votingEndsAt = await getSetting("voting_ends_at");
+  const votingActive = (await getSetting("voting_active", isTest)) === "true";
+  const votingEndsAt = (await getSetting("voting_ends_at", isTest));
 
   let defaultEndsAtLocal = "";
   if (votingEndsAt) {
@@ -151,8 +156,8 @@ export default async function AdminPage({
       })
     : "No deadline set";
 
-  const totalVoters = await getTotalVoters();
-  const tallies = await getTallies();
+  const totalVoters = await getTotalVoters(isTest);
+  const tallies = await getTallies(isTest);
 
   // Map votes by Category -> Nominee
   const tallyMap: Record<string, Record<string, number>> = {};
@@ -193,6 +198,29 @@ export default async function AdminPage({
       <div className="pointer-events-none fixed inset-0 bg-radial-glow" />
 
       <div className="relative mx-auto max-w-4xl px-4 sm:px-6 py-8 sm:py-14">
+        {/* Mode Toggle Banner */}
+        {isTest ? (
+          <div className="mb-6 rounded-lg border border-purple-500/30 bg-purple-950/15 px-4 py-3 text-center text-xs sm:text-sm font-mono text-purple-300 shadow-sm flex items-center justify-between gap-4">
+            <span className="flex items-center gap-2">
+              <span>⚠️</span>
+              <span><strong>TEST SIMULATOR DATABASE:</strong> You are viewing test data from `test_votes.db`.</span>
+            </span>
+            <Link href="/admin" className="rounded-full border border-purple-300/40 px-3 py-1 text-xs hover:bg-purple-950/40 text-purple-200 transition-colors shrink-0">
+              Switch to Live
+            </Link>
+          </div>
+        ) : (
+          <div className="mb-6 rounded-lg border border-emerald-500/30 bg-emerald-950/15 px-4 py-3 text-center text-xs sm:text-sm font-mono text-emerald-300 shadow-sm flex items-center justify-between gap-4">
+            <span className="flex items-center gap-2">
+              <span>🟢</span>
+              <span><strong>LIVE ELECTION DATABASE:</strong> You are viewing live election results.</span>
+            </span>
+            <Link href="/admin?mode=test" className="rounded-full border border-emerald-300/40 px-3 py-1 text-xs hover:bg-emerald-950/40 text-emerald-200 transition-colors shrink-0">
+              Switch to Test
+            </Link>
+          </div>
+        )}
+
         {/* Dashboard Header */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-white/10 pb-6">
           <div>
@@ -206,23 +234,29 @@ export default async function AdminPage({
 
           <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2.5">
             <Link
-              href="/admin/winners"
+              href={`/admin/winners${modeQuery}`}
               className="rounded-full border border-gold/40 bg-gold-deep/15 px-4 py-2 text-xs font-semibold text-gold-light hover:bg-gold-deep/30 transition-colors shadow-sm"
             >
               🏆 Winners View
             </Link>
             <Link
-              href="/admin/voters"
+              href={`/admin/voters${modeQuery}`}
               className="rounded-full border border-white/15 bg-char px-4 py-2 text-xs font-semibold text-parchment hover:border-gold/50 transition-colors"
             >
               📜 Voter Logs
             </Link>
-            <a
-              href="/admin"
+            <Link
+              href={`/admin/test-vote${modeQuery}`}
+              className="rounded-full border border-gold/30 bg-char px-4 py-2 text-xs font-semibold text-muted hover:text-gold-light hover:border-gold/60 transition-colors shadow-sm"
+            >
+              🧪 Test Voting
+            </Link>
+            <Link
+              href={`/admin${modeQuery}`}
               className="rounded-full border border-white/15 bg-char px-4 py-2 text-xs font-semibold text-muted hover:text-parchment hover:border-white/30 transition-colors"
             >
               🔄 Refresh
-            </a>
+            </Link>
             <form action={handleLogout}>
               <button
                 type="submit"
@@ -292,6 +326,7 @@ export default async function AdminPage({
 
               {/* Toggle Ballot Status Form */}
               <form action={updateVotingSettings}>
+                <input type="hidden" name="is_test" value={isTest ? "true" : "false"} />
                 <input type="hidden" name="active" value={votingActive ? "false" : "true"} />
                 <button
                   type="submit"
@@ -311,6 +346,7 @@ export default async function AdminPage({
               <p className="text-xs text-muted uppercase font-mono">Set/Modify Deadline</p>
               
               <form action={updateVotingSettings} className="space-y-3">
+                <input type="hidden" name="is_test" value={isTest ? "true" : "false"} />
                 <input
                   type="datetime-local"
                   name="ends_at"
@@ -350,7 +386,7 @@ export default async function AdminPage({
                 Permanently delete all votes & voter logs to restart the election from zero.
               </p>
             </div>
-            <ResetDatabaseButton action={resetDatabase} />
+            <ResetDatabaseButton action={boundResetDatabase} />
           </div>
         </div>
 

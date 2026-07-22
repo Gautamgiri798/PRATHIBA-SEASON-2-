@@ -6,7 +6,11 @@ import Link from "next/link";
 
 export const dynamic = "force-dynamic";
 
-export default async function AdminWinnersPage() {
+export default async function AdminWinnersPage({
+  searchParams,
+}: {
+  searchParams: { mode?: string };
+}) {
   const cookieStore = cookies();
   const sessionToken = cookieStore.get("admin_session")?.value;
   const ADMIN_PASSCODE = process.env.ADMIN_PASSCODE || "admin123";
@@ -17,8 +21,11 @@ export default async function AdminWinnersPage() {
     redirect("/admin");
   }
 
-  const votingActive = (await getSetting("voting_active")) === "true";
-  const votingEndsAt = await getSetting("voting_ends_at");
+  const isTest = searchParams.mode === "test";
+  const modeQuery = isTest ? "?mode=test" : "";
+
+  const votingActive = (await getSetting("voting_active", isTest)) === "true";
+  const votingEndsAt = await getSetting("voting_ends_at", isTest);
 
   const deadlineIST = votingEndsAt
     ? new Date(votingEndsAt).toLocaleString("en-IN", {
@@ -36,8 +43,8 @@ export default async function AdminWinnersPage() {
     redirect("/admin");
   }
 
-  const totalVoters = await getTotalVoters();
-  const tallies = await getTallies();
+  const totalVoters = await getTotalVoters(isTest);
+  const tallies = await getTallies(isTest);
 
   // Map votes by Category -> Nominee
   const tallyMap: Record<string, Record<string, number>> = {};
@@ -89,6 +96,29 @@ export default async function AdminWinnersPage() {
       <div className="pointer-events-none fixed inset-0 bg-radial-glow" />
 
       <div className="relative mx-auto max-w-5xl px-4 sm:px-6 py-8 sm:py-14">
+        {/* Mode Toggle Banner */}
+        {isTest ? (
+          <div className="mb-6 rounded-lg border border-purple-500/30 bg-purple-950/15 px-4 py-3 text-center text-xs sm:text-sm font-mono text-purple-300 shadow-sm flex items-center justify-between gap-4">
+            <span className="flex items-center gap-2">
+              <span>⚠️</span>
+              <span><strong>TEST SIMULATOR DATABASE:</strong> You are viewing test data from `test_votes.db`.</span>
+            </span>
+            <Link href="/admin/winners" className="rounded-full border border-purple-300/40 px-3 py-1 text-xs hover:bg-purple-950/40 text-purple-200 transition-colors shrink-0">
+              Switch to Live
+            </Link>
+          </div>
+        ) : (
+          <div className="mb-6 rounded-lg border border-emerald-500/30 bg-emerald-950/15 px-4 py-3 text-center text-xs sm:text-sm font-mono text-emerald-300 shadow-sm flex items-center justify-between gap-4">
+            <span className="flex items-center gap-2">
+              <span>🟢</span>
+              <span><strong>LIVE ELECTION DATABASE:</strong> You are viewing live election results.</span>
+            </span>
+            <Link href="/admin/winners?mode=test" className="rounded-full border border-emerald-300/40 px-3 py-1 text-xs hover:bg-emerald-950/40 text-emerald-200 transition-colors shrink-0">
+              Switch to Test
+            </Link>
+          </div>
+        )}
+
         {/* Navigation Header */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-white/10 pb-6">
           <div>
@@ -102,29 +132,35 @@ export default async function AdminWinnersPage() {
 
           <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2.5">
             <Link
-              href="/admin"
+              href={`/admin${modeQuery}`}
               className="rounded-full border border-white/15 bg-char px-4 py-2 text-xs font-semibold text-muted hover:text-parchment hover:border-white/30 transition-colors"
             >
               📊 All Leaderboard
             </Link>
             <Link
-              href="/admin/winners"
+              href={`/admin/winners${modeQuery}`}
               className="rounded-full border border-gold/50 bg-gold-deep/20 px-4 py-2 text-xs font-semibold text-gold-light shadow-sm"
             >
               🏆 Winners Only
             </Link>
             <Link
-              href="/admin/voters"
+              href={`/admin/voters${modeQuery}`}
               className="rounded-full border border-white/15 bg-char px-4 py-2 text-xs font-semibold text-muted hover:text-parchment hover:border-white/30 transition-colors"
             >
               📜 Voter Logs
             </Link>
-            <a
-              href="/admin/winners"
+            <Link
+              href={`/admin/test-vote${modeQuery}`}
+              className="rounded-full border border-gold/30 bg-char px-4 py-2 text-xs font-semibold text-muted hover:text-gold-light hover:border-gold/60 transition-colors shadow-sm"
+            >
+              🧪 Test Voting
+            </Link>
+            <Link
+              href={`/admin/winners${modeQuery}`}
               className="rounded-full border border-white/15 bg-char px-4 py-2 text-xs font-semibold text-muted hover:text-parchment hover:border-white/30 transition-colors"
             >
               🔄 Refresh
-            </a>
+            </Link>
             <form action={handleLogout}>
               <button
                 type="submit"

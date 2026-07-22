@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { castVoteTransaction, getSetting, getTotalVoters } from "@/lib/db";
+import { castVoteTransaction, getTotalVoters } from "@/lib/db";
 import { normalizeContact, ContactType } from "@/lib/validate";
 import { CATEGORIES } from "@/lib/categories";
 
@@ -9,25 +9,15 @@ const NOMINEE_IDS_BY_CATEGORY: Record<string, Set<string>> = Object.fromEntries(
 );
 
 export async function POST(req: NextRequest) {
-  // Verify server-side voting state configuration
-  const votingActive = (await getSetting("voting_active")) === "true";
-  const votingEndsAt = await getSetting("voting_ends_at");
+  // Verify administrator session
+  const ADMIN_PASSCODE = process.env.ADMIN_PASSCODE || "admin123";
+  const sessionToken = req.cookies.get("admin_session")?.value;
 
-  if (!votingActive) {
+  if (sessionToken !== ADMIN_PASSCODE) {
     return NextResponse.json(
-      { error: "Voting is currently stopped or has not started yet." },
-      { status: 403 }
+      { error: "Unauthorized. Admin session is required for test voting." },
+      { status: 401 }
     );
-  }
-
-  if (votingEndsAt) {
-    const endsDate = new Date(votingEndsAt);
-    if (new Date() > endsDate) {
-      return NextResponse.json(
-        { error: "Voting has closed. The deadline has already passed." },
-        { status: 403 }
-      );
-    }
   }
 
   let body: {
@@ -66,8 +56,6 @@ export async function POST(req: NextRequest) {
     );
   }
 
-
-
   if (!votes || typeof votes !== "object") {
     return NextResponse.json({ error: "No votes were submitted." }, { status: 400 });
   }
@@ -93,11 +81,12 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const voterId = await castVoteTransaction(name.trim(), normalized, contactType, votes);
-    const totalVoters = await getTotalVoters();
+    // Write test vote with isTest=true to the test database
+    const voterId = await castVoteTransaction(name.trim(), normalized, contactType, votes, true);
+    const totalVoters = await getTotalVoters(true);
     return NextResponse.json({ ok: true, voterId, totalVoters });
   } catch (error: any) {
-    // Catch PostgreSQL duplicate voter contact constraint (code '23505') or SQLite constraint
+    // Catch unique constraint (duplicate voter contact)
     if (
       error.code === "23505" ||
       error.code === "SQLITE_CONSTRAINT_UNIQUE" ||
@@ -105,11 +94,11 @@ export async function POST(req: NextRequest) {
       error.message?.includes("duplicate key")
     ) {
       return NextResponse.json(
-        { error: "This mobile number has already voted. Only one vote is allowed per person." },
+        { error: "This mobile number has already voted in the test database. Please use another number or clear the test database." },
         { status: 409 }
       );
     }
-    console.error("cast_vote error:", error);
-    return NextResponse.json({ error: "Something went wrong recording your vote. Please try again." }, { status: 500 });
+    console.error("test_cast_vote error:", error);
+    return NextResponse.json({ error: "Something went wrong recording your test vote. Please try again." }, { status: 500 });
   }
 }
