@@ -656,7 +656,7 @@ function SuccessStep({
   const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "6372174006";
   const sanitizedNumber = whatsappNumber.replace(/\D/g, "");
   const whatsappUrl = `https://wa.me/${sanitizedNumber.length === 10 ? "91" + sanitizedNumber : sanitizedNumber}`;
-  const whatsappGroupLink = process.env.NEXT_PUBLIC_WHATSAPP_GROUP_LINK || "";
+  const whatsappGroupLink = process.env.NEXT_PUBLIC_WHATSAPP_GROUP_LINK || "https://chat.whatsapp.com/EvPgWCqJXV8DaObpSONrou";
 
   return (
     <div className="animate-rise text-center py-8 sm:py-12">
