@@ -53,8 +53,14 @@ export function TestVoteWizard({
 
   function handleIdentitySubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!name.trim() || name.trim().length < 2) {
+    const cleanedName = name.trim();
+    if (!cleanedName || cleanedName.length < 2) {
       setIdentityError("Please enter your full name (at least 2 letters).");
+      return;
+    }
+    const nameRegex = /^[a-zA-Z\s]+$/;
+    if (!nameRegex.test(cleanedName)) {
+      setIdentityError("Name must only contain alphabetic letters and spaces.");
       return;
     }
     const normalized = normalizeContact(contact, contactType);
@@ -571,13 +577,38 @@ function SuccessStep({
           This mobile number (<strong className="text-parchment font-mono font-bold">{contact}</strong>) has already been used to vote and cannot be used again.
         </p>
 
-        <div className="border-t border-white/10 pt-5">
-          <p className="font-bold text-gold text-base sm:text-lg flex items-center gap-2 uppercase tracking-wide">
-            <span>📸</span> Verification Required
+        <div className="border-t border-white/10 pt-6">
+          <h3 className="font-display font-bold text-gold text-base sm:text-lg flex items-center gap-2 uppercase tracking-wider">
+            <span>📸</span> Final Step – Vote Verification
+          </h3>
+          <p className="mt-2 text-parchment/85 text-sm sm:text-base leading-relaxed">
+            Your vote has been successfully submitted. To complete the verification process, please take a screenshot of this confirmation page and share it in our WhatsApp Verification Group using the same registered mobile number you used for voting.
           </p>
-          <p className="mt-2 text-parchment/80 text-sm sm:text-base leading-relaxed">
-            Please take a screenshot of this confirmation page and send it via WhatsApp to <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className="text-gold-light hover:text-gold underline underline-offset-4 font-mono font-bold transition-colors">{whatsappNumber}</a>{whatsappGroupLink && <> (or join our <a href={whatsappGroupLink} target="_blank" rel="noopener noreferrer" className="text-gold-light hover:text-gold underline underline-offset-4 font-bold transition-colors">WhatsApp Group</a>)</>} using the same registered mobile number you used for voting. This helps us verify and validate your submission successfully.
-          </p>
+          {whatsappGroupLink && (
+            <div className="mt-5 p-5 bg-gradient-to-r from-emerald-950/30 to-emerald-900/10 border border-emerald-500/35 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-inner">
+              <div className="space-y-1.5 overflow-hidden">
+                <p className="text-xs font-mono uppercase tracking-widest text-emerald-light font-bold">
+                  🔗 Verification Group Link
+                </p>
+                <a
+                  href={whatsappGroupLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block font-mono text-[11px] sm:text-xs text-parchment/70 hover:text-emerald-light underline truncate transition-colors"
+                >
+                  {whatsappGroupLink}
+                </a>
+              </div>
+              <a
+                href={whatsappGroupLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-2 rounded-full bg-emerald-500/10 border border-emerald-400/40 hover:border-emerald-400/80 hover:bg-emerald-500/20 px-5 py-2.5 text-xs sm:text-sm font-bold text-emerald-light transition-all shrink-0 cursor-pointer select-none"
+              >
+                <span>💬</span> Join Group
+              </a>
+            </div>
+          )}
         </div>
       </div>
 

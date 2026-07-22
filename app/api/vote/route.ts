@@ -45,8 +45,14 @@ export async function POST(req: NextRequest) {
 
   const { name, contact, contactType, votes } = body;
 
-  if (!name || typeof name !== "string" || name.trim().length < 2) {
+  const cleanedName = name ? name.trim() : "";
+  if (!cleanedName || typeof name !== "string" || cleanedName.length < 2) {
     return NextResponse.json({ error: "Please enter your full name (at least 2 letters)." }, { status: 400 });
+  }
+
+  const nameRegex = /^[a-zA-Z\s]+$/;
+  if (!nameRegex.test(cleanedName)) {
+    return NextResponse.json({ error: "Name must only contain alphabetic letters and spaces." }, { status: 400 });
   }
 
   if (!contact || !contactType || (contactType !== "mobile" && contactType !== "email")) {
