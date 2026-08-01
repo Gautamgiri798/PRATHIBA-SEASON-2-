@@ -132,16 +132,22 @@ export default async function AdminWinnersPage({
 
           <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2.5">
             <Link
+              href={`/admin/reveal${modeQuery}`}
+              className="rounded-full border border-white/15 bg-char px-4 py-2 text-xs font-semibold text-muted hover:text-parchment hover:border-white/30 transition-colors"
+            >
+              ✨ Cinematic Reveal
+            </Link>
+            <Link
               href={`/admin${modeQuery}`}
               className="rounded-full border border-white/15 bg-char px-4 py-2 text-xs font-semibold text-muted hover:text-parchment hover:border-white/30 transition-colors"
             >
-              📊 All Leaderboard
+              📊 Leaderboard
             </Link>
             <Link
               href={`/admin/winners${modeQuery}`}
               className="rounded-full border border-gold/50 bg-gold-deep/20 px-4 py-2 text-xs font-semibold text-gold-light shadow-sm"
             >
-              🏆 Winners Only
+              🏆 Winners Board
             </Link>
             <Link
               href={`/admin/voters${modeQuery}`}

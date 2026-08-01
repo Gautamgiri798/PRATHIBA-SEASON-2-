@@ -323,9 +323,9 @@ export const CATEGORIES: Category[] = [
     ],
   },
 
- {
+  {
     id: "best-actor/actress-in-comedy",
-    title: "Best Actor/Actress In Comedy",
+    title: "Best Comedian",
     group: "Film Production Awards",
     description: "Bringing laughter to life with unforgettable performances.",
     thumbnailUrl: "/nominees/All Category/Best Comedy.jpeg",
@@ -333,26 +333,31 @@ export const CATEGORIES: Category[] = [
       {
         id: "n1",
         name: "Chandni Suna",
+        song: "comedy theme",
         imageUrl: "/nominees/Best Actor,Actress in Comedy/Chandni Suna.jpeg",
       },
       {
         id: "n2",
         name: "Sumit",
+        song: "comedy theme",
         imageUrl: "/nominees/Best Actor,Actress in Comedy/Sumit.jpeg",
       },
       {
         id: "n3",
         name: "Lokesh",
+        song: "comedy theme",
         imageUrl: "/nominees/Best Actor,Actress in Comedy/Lokesh.jpeg",
       },
       {
         id: "n4",
         name: "Tankadhar",
+        song: "comedy theme",
         imageUrl: "/nominees/Best Actor,Actress in Comedy/Tankadhar.jpeg",
       },
       {
         id: "n5",
         name: "Riya",
+        song: "comedy theme",
         imageUrl: "/nominees/Best Actor,Actress in Comedy/Riya.jpeg",
       },
     ],
